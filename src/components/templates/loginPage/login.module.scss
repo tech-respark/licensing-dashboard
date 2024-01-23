@@ -1,0 +1,36 @@
+.loginPageWrap {
+    .headerWrap {
+        width: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: #dee1ec;
+
+        .logo {
+            height: 80px;
+            width: 200px;
+            padding: 10px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            img {
+                width: 100%;
+                height: auto;
+            }
+        }
+    }
+
+    .pageContent {
+        height: calc(100vh - 80px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+
+        .heading {
+            width: 100%;
+            margin-bottom: 40px;
+        }
+    }
+}

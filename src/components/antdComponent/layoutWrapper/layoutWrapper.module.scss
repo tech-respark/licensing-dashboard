@@ -1,0 +1,26 @@
+@import "@styles/abstracts/mixins";
+
+.layoutWrapper {
+  width: 100%;
+
+  button {
+    &.ant-btn-lg {
+      display: flex;
+      font-size: 21px !important;
+    }
+  }
+
+  .logoWrap {
+    background-color: #dee1ec;
+    padding: 10px;
+
+    img {
+      width: 80%;
+      height: auto;
+    }
+  }
+
+  .mainContentWraper {
+    padding: 10px;
+  }
+}

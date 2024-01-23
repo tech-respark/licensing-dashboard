@@ -1,0 +1,85 @@
+{
+  "compilerOptions": {
+    "target": "es5",
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ],
+      "@styles/*": [
+        "public/styles/*"
+      ],
+      "@constant/*": [
+        "src/constants/*"
+      ],
+      "@type/*": [
+        "src/types/*"
+      ],
+      "@hook/*": [
+        "src/hooks/*"
+      ],
+      "@reduxStore/*": [
+        "src/redux/store/*"
+      ],
+      "@reduxSlices/*": [
+        "src/redux/slices/*"
+      ],
+      "@axiosClient/*": [
+        "src/lib/axios/*"
+      ],
+      "@database/*": [
+        "src/database/*"
+      ],
+      "@lib/*": [
+        "src/lib/*"
+      ],
+      "@providers/*": [
+        "src/providers/*"
+      ],
+      "@util/*": [
+        "src/utils/*"
+      ],
+      "@apiService/*": [
+        "src/apiService/*"
+      ],
+      "@assets/*": [
+        "public/assets/*"
+      ],
+      "@objectPropertiesEditor/*": [
+        "src/components/templates/craftBuilder/objectPropertiesEditor/*"
+      ],
+    },
+    "noUnusedLocals": true,
+    "noUnusedParameters": true
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}

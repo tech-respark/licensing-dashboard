@@ -1,0 +1,28 @@
+@import "@styles/abstracts/mixins";
+
+.sidebarWrap {
+    width: 100%;
+    position: static;
+    left: 0;
+    top: 0;
+
+    button {
+        .ant-btn-lg {
+            display: flex;
+            font-size: 21px !important;
+        }
+    }
+
+    .logoWrap {
+        background-color: #dee1ec;
+        padding: 15px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+
+        img {
+            width: 100%;
+            height: auto;
+        }
+    }
+}

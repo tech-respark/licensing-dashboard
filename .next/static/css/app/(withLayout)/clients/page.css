@@ -1,0 +1,31 @@
+/*!********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
+  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[11].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[11].oneOf[9].use[5]!./src/components/templates/clientsPage/clientsPage.module.scss ***!
+  \********************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/
+.clientsPage_dashboardWrapper__nLymn {
+  width: 100%;
+  overflow: auto;
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+.clientsPage_dashboardWrapper__nLymn::-webkit-scrollbar {
+  display: none;
+}
+.clientsPage_dashboardWrapper__nLymn .clientsPage_tableHeader__XFa0B {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-right: 10px;
+}
+.clientsPage_dashboardWrapper__nLymn .clientsPage_tableHeader__XFa0B .clientsPage_label__wH59n {
+  font-size: 16px;
+}
+.clientsPage_dashboardWrapper__nLymn .clientsPage_columnSettings__Pu5HE {
+  width: 400px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+}
