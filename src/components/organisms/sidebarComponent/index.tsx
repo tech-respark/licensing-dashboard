@@ -2,7 +2,7 @@
 import { LOGO_IMAGE } from '@/constants/common';
 import NavigationMenus from '@/constants/navigation';
 import type { MenuProps } from 'antd';
-import { Layout, Menu, theme } from 'antd';
+import { Layout, Menu } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
 import React from 'react';
 import Styles from './sidebar.module.scss';
@@ -12,7 +12,6 @@ function SidebarComponent({ collapsed, setCollapsed }: any) {
 
     const router = useRouter()
     const pathname = usePathname()
-    const { token } = theme.useToken()
     type MenuItem = Required<MenuProps>['items'][number];
 
     function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[],): MenuItem {

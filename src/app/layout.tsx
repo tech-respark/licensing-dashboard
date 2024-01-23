@@ -5,10 +5,8 @@ import ErrorBoundaryProvider from '@/providers/errorBoundaryProvider'
 import { ReduxStoreProvider } from '@/providers/reduxProvider'
 import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
-import { Suspense } from 'react'
 import "../../public/styles/app.scss"
 import './globals.css'
-import Loading from './loading'
 
 const INTER_FONT = Inter({
   subsets: ['latin'],
@@ -27,11 +25,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
         <ErrorBoundaryProvider>
           <ReduxStoreProvider>
             <AntdLayoutWrapper>
-              <Suspense fallback={<Loading page="Main Layout" />}>
-                <Loader />
-                <Toast />
-                {children}
-              </Suspense>
+              <Loader />
+              <Toast />
+              {children}
             </AntdLayoutWrapper>
           </ReduxStoreProvider>
         </ErrorBoundaryProvider>

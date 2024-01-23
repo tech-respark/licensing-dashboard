@@ -1,7 +1,7 @@
 'use client'
 import { Button, Result } from 'antd';
 import { useRouter } from 'next/navigation';
-import styles from '../../components/templates/usersPage/usersPage.module.scss'
+import styles from "./staticPages.module.scss";
 
 function Unauthorised() {
     const router = useRouter()

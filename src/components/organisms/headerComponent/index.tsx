@@ -2,12 +2,12 @@ import NavigationMenus from "@/constants/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { getDarkModeState, toggleDarkMode } from "@/redux/slices/clientThemeConfig";
-import { Avatar, Button, Card, Layout, Popover, Space, Typography, theme } from "antd";
+import { Avatar, Button, Card, Layout, Popover, Space, Typography } from "antd";
 import { usePathname } from "next/navigation";
 import { useCallback } from "react";
 import { LuBell, LuCloudSunRain, LuLogOut, LuPen, LuUser } from 'react-icons/lu';
 import Styles from "./headerComponent.module.scss";
-const { Header, Content, Sider } = Layout;
+const { Header } = Layout;
 const { Text } = Typography;
 const { Meta } = Card;
 
@@ -15,7 +15,6 @@ function HeaderComponent() {
     const pathname = usePathname()
     const dispatch = useAppDispatch()
     const isDarkMode = useAppSelector(getDarkModeState);
-    const { token } = theme.useToken()
 
     const currentpage = useCallback(
         () => {
@@ -35,8 +34,8 @@ function HeaderComponent() {
             <Card
                 style={{ width: 300 }}
                 actions={[
-                    <Text> <LuPen /> Edit</Text>,
-                    <Text> <LuLogOut /> Logout</Text>,
+                    <Text key="Edit"> <LuPen /> Edit</Text>,
+                    <Text key="Logout"> <LuLogOut /> Logout</Text>,
                 ]}
             >
                 <Meta

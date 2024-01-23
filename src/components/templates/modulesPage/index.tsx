@@ -14,17 +14,16 @@ function ModulePage() {
             align='start'
             direction="vertical"
             styles={{ item: { width: "100%" } }}
+            size={10}
         >
             <Space align="end">
-                <Card key={"Add-new"} title={""} style={{ width: "100%" }} >
-                    <Meta title={<Space><Button type="dashed" onClick={() => setIsModalOpen(true)}>Add New Module</Button></Space>} />
-                </Card>
+                <Button size="large" type="primary" onClick={() => setIsModalOpen(true)}>Add New Module</Button>
             </Space>
             <Space className={Styles.usersList} wrap>
                 {ModulesList.map((moduleDetails: any) => {
                     return <React.Fragment key={moduleDetails.key}>
                         <Badge dot color={moduleDetails.active ? "green" : "red"}>
-                            <Card key={moduleDetails.key} title={moduleDetails.name} extra={<Button type="dashed" onClick={() => setIsModalOpen(true)}>View</Button>} style={{ width: 300 }}>
+                            <Card key={moduleDetails.key} title={moduleDetails.name} extra={<Button type="dashed" onClick={() => setIsModalOpen(true)}>View</Button>} style={{ width: 250 }}>
                                 <Meta description={`Monthly Price : ${moduleDetails.monthlyPricing}`} />
                                 <Meta description={`Quartrly Pricing : ${moduleDetails.quarterlyprice}`} />
                                 <Meta description={`Half Yearly Pricing : ${moduleDetails.halfYearlyPrice}`} />

@@ -16,9 +16,7 @@ function UsersPage() {
             styles={{ item: { width: "100%" } }}
         >
             <Space align="end">
-                <Card key={"Add-new"} title={""} style={{ width: "100%" }} >
-                    <Meta title={<Space><Button type="dashed" onClick={() => setIsModalOpen(true)}>Add New User</Button></Space>} />
-                </Card>
+                <Button size="large" type="primary" onClick={() => setIsModalOpen(true)}>Add New User</Button>
             </Space>
             <Space className={Styles.usersList} wrap>
                 {SaalesPersonsList.map((salesDetails: any) => {

@@ -1,12 +1,10 @@
 'use client'
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getLoaderState } from '@/redux/slices/loader';
-import { theme } from 'antd';
 import { useEffect } from 'react';
 import Style from './loader.module.scss';
 
 function Loader() {
-    const { token } = theme.useToken();
     const loading = useAppSelector(getLoaderState);
 
     useEffect(() => {

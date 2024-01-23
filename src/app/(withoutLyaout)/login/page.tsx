@@ -1,12 +1,9 @@
 import LoginPage from '@/components/templates/loginPage'
-import React, { Suspense } from 'react'
-import Loading from '../../loading'
+import React from 'react'
 
 function page() {
     return <React.Fragment>
-        <Suspense fallback={<Loading page={'Login'} />}>
-            <LoginPage />
-        </Suspense>
+        <LoginPage />
     </React.Fragment>
 }
 

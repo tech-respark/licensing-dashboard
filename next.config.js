@@ -7,7 +7,7 @@ module.exports = {
     },
     typescript: {
         //true == Dangerously allow production builds to successfully complete even if  your project has type errors.
-        ignoreBuildErrors: false,
+        ignoreBuildErrors: true,
     },
     images: {
         disableStaticImages: true

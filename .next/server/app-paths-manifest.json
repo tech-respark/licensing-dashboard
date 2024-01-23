@@ -1,12 +1,3 @@
 {
-  "/page": "app/page.js",
-  "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
-  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
-  "/(withLayout)/sales/page": "app/(withLayout)/sales/page.js",
-  "/(withLayout)/clients/page": "app/(withLayout)/clients/page.js",
-  "/(withLayout)/reports/page": "app/(withLayout)/reports/page.js",
-  "/(withLayout)/plans/page": "app/(withLayout)/plans/page.js",
-  "/(withLayout)/modules/page": "app/(withLayout)/modules/page.js",
-  "/(withLayout)/users/page": "app/(withLayout)/users/page.js",
-  "/(withoutLyaout)/login/page": "app/(withoutLyaout)/login/page.js"
+  "/page": "app/page.js"
 }

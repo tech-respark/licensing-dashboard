@@ -10,7 +10,7 @@ import { StyleProvider, createCache } from '@ant-design/cssinjs';
 import type Entity from '@ant-design/cssinjs/es/Cache';
 import { Layout, theme } from 'antd';
 import { useRouter } from 'next/navigation';
-import React, { Fragment, useState } from 'react';
+import React, { Fragment, useEffect, useState } from 'react';
 import Styles from './layoutWrapper.module.scss';
 const { Content } = Layout;
 
@@ -25,7 +25,14 @@ export default function AntdLayoutWrapper(props: any) {
 
     const userData = useAppSelector(getAuthUserState)
     console.log("userData in dahsboard", userData)
-    if (!userData) router.push("login")
+    // if (!userData) return router.push("login")
+
+    useEffect(() => {
+        if (!userData) {
+            return router.push("login")
+        }
+    }, [userData])
+
 
 
     return (

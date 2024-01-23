@@ -1488,63 +1488,6 @@ button {
   !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[12].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[12].use[3]!./src/app/globals.css ***!
   \*****************************************************************************************************************************************************************************************************************************************************************/
 
-/*!*******************************************************************************************************************************************************************************************************************************************************************!*\
-  !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[7].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[7].use[3]!./src/app/page.module.css ***!
-  \*******************************************************************************************************************************************************************************************************************************************************************/
-.page_loadingWrap__8T19o {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background: unset;
-  width: 100vw;
-  height: 100vh;
-}
-
-.page_loadingWrap__8T19o svg {
-  width: 100%;
-  height: 300px;
-}
-
-.page_bgWrap__lvKUk {
-  z-index: 10;
-  pointer-events: none;
-  position: absolute;
-  bottom: -250px;
-  left: 50%;
-  transform: translateX(-50%) scale(1.5);
-  width: 100vw;
-  height: 100vh;
-  opacity: 0.2;
-  filter: blur(100px);
-  will-change: transform;
-  animation-timeline: auto;
-  animation-range-start: normal;
-  animation-range-end: normal;
-  background: linear-gradient(135deg,
-      rgb(114, 46, 209) 0%,
-      rgb(22, 119, 255) 30%,
-      rgba(245, 34, 224, 0.519) 70%,
-      rgb(19, 194, 194) 100%,
-      var(--primary-color-alpha),
-      #00bfff) 0% 0% / 200% 200%;
-  animation: 20s ease 3s infinite normal none running page_glow__1cPD_;
-}
-
-
-@keyframes page_glow__1cPD_ {
-  0% {
-    background-position: 0px -100%;
-  }
-
-  50% {
-    background-position: 200% 50%;
-  }
-
-  100% {
-    background-position: 0px -100%;
-  }
-}
 /*!****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************!*\
   !*** css ./node_modules/next/dist/build/webpack/loaders/css-loader/src/index.js??ruleSet[1].rules[11].oneOf[9].use[2]!./node_modules/next/dist/build/webpack/loaders/postcss-loader/src/index.js??ruleSet[1].rules[11].oneOf[9].use[3]!./node_modules/next/dist/build/webpack/loaders/resolve-url-loader/index.js??ruleSet[1].rules[11].oneOf[9].use[4]!./node_modules/next/dist/compiled/sass-loader/cjs.js??ruleSet[1].rules[11].oneOf[9].use[5]!./src/components/organisms/headerComponent/headerComponent.module.scss ***!
   \****************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************************/

@@ -34,20 +34,9 @@ function DashboardPage() {
         setSortedInfo(sorter as Sorts);
     };
 
-    const clearFilters = () => {
-        setFilteredInfo({});
-    };
-
     const clearAll = () => {
         setFilteredInfo({});
         setSortedInfo({});
-    };
-
-    const setAgeSort = () => {
-        setSortedInfo({
-            order: 'descend',
-            columnKey: 'age',
-        });
     };
 
     const data: DataType[] = [...salesList, ...salesList];

@@ -10,6 +10,7 @@ import { toggleLoader } from '@/redux/slices/loader';
 import { showErrorToast, showSuccessToast } from '@/redux/slices/toast';
 import { Button, Form, Input, theme } from 'antd';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 import Styles from "./login.module.scss";
 
 type FieldType = {
@@ -25,7 +26,12 @@ function LoginPage() {
 
     const userData = useAppSelector(getAuthUserState)
     console.log("userData in dahsboard", userData)
-    if (Boolean(userData)) router.push("/")
+    // if (Boolean(userData)) return router.push("/")
+    useEffect(() => {
+        if (Boolean(userData)) {
+            return router.push("/")
+        }
+    }, [userData])
 
     const signInWithCredentials = async (values: any) => {
         dispatch(toggleLoader(true))

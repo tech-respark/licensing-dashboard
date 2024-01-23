@@ -36,7 +36,7 @@ import { useEffect, useMemo, useRef } from "react";
 //     };
 // };
 
-export function _debounce(func, delay = 1000) {
+export function _debounce(func: any, delay: any = 1000) {
     // Declare a variable called 'timer' to store the timer ID
     let timeout;
     // Return an anonymous function that takes in any number of arguments

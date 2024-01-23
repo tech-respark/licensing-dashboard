@@ -106,7 +106,7 @@ function ClientsPage() {
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title="All Clients List" extra={<Button type='primary' onClick={addClient}>Add New Client</Button>}>
+                <Card title="All Clients List" extra={<Button type='primary' size='large' onClick={addClient}>Add New Client</Button>}>
                     <Table
                         bordered
                         pagination={{ pageSize: 10 }}
