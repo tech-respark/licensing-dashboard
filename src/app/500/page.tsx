@@ -1,5 +1,5 @@
 'use client'
-import styles from "@organismsCSS/staticPages/staticPages.module.scss";
+import styles from '../../components/templates/usersPage/usersPage.module.scss'
 import { Button, Result } from 'antd';
 import { useRouter } from 'next/navigation';
 

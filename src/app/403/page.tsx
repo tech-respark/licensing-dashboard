@@ -1,7 +1,7 @@
 'use client'
-import styles from "@organismsCSS/staticPages/staticPages.module.scss";
 import { Button, Result } from 'antd';
 import { useRouter } from 'next/navigation';
+import styles from '../../components/templates/usersPage/usersPage.module.scss'
 
 function Unauthorised() {
     const router = useRouter()
