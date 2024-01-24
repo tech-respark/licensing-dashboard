@@ -50,7 +50,7 @@ export default function AntdLayoutWrapper(props: any) {
                             </Layout>
                         </Layout>
                     </Fragment> : <Fragment>
-                        <div style={{ background: "red" }}>
+                        <div>
                             {props.children}
                         </div>
                     </Fragment>}

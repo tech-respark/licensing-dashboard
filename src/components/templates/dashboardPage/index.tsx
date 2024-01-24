@@ -5,6 +5,7 @@ import type { CheckboxOptionType, TableColumnsType, TableProps } from 'antd';
 import { Button, Card, Checkbox, Popover, Space, Table, Typography } from 'antd';
 import { useState } from 'react';
 import Styles from "./dashboardPage.module.scss";
+import SalesDetailsModal from './salesDetailsModal';
 import SalesPersonSale from './salesPersonSale';
 const { Text } = Typography;
 interface DataType {
@@ -27,6 +28,7 @@ type Sorts = GetSingle<Parameters<OnChange>[2]>;
 function DashboardPage() {
     const [filteredInfo, setFilteredInfo] = useState<Filters>({});
     const [sortedInfo, setSortedInfo] = useState<Sorts>({});
+    const [isModalOpen, setIsModalOpen] = useState(null);
 
     const handleChange: OnChange = (pagination, filters, sorter) => {
         console.log('Various parameters', pagination, filters, sorter);
@@ -154,6 +156,14 @@ function DashboardPage() {
             <Space className={Styles.dashboardWrapper} direction='vertical'>
                 <Card title={renderHeaders()} extra={<Button type='dashed' onClick={clearAll}>Clear Filters</Button>}>
                     <Table
+                        onRow={(record: any, rowIndex: any) => {
+                            return {
+                                onClick: (event) => {
+                                    console.log(record)
+                                    setIsModalOpen(record)
+                                }, // click row
+                            };
+                        }}
                         bordered
                         pagination={{ pageSize: 10 }}
                         scroll={{ x: 1500, y: 500 }}
@@ -164,6 +174,7 @@ function DashboardPage() {
                     <SalesPersonSale />
                 </Card>
             </Space>
+            {Boolean(isModalOpen) && <SalesDetailsModal isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}
         </>
     );
 }

@@ -23,6 +23,18 @@
       "static/chunks/main-app.js",
       "static/css/app/not-found.css",
       "static/chunks/app/not-found.js"
+    ],
+    "/(withoutLyaout)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withoutLyaout)/layout.css",
+      "static/chunks/app/(withoutLyaout)/layout.js"
+    ],
+    "/(withoutLyaout)/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withoutLyaout)/login/page.css",
+      "static/chunks/app/(withoutLyaout)/login/page.js"
     ]
   }
 }

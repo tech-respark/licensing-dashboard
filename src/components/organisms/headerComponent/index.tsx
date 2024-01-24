@@ -1,9 +1,11 @@
 import NavigationMenus from "@/constants/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
+import { setAuthUser } from "@/redux/slices/auth";
 import { getDarkModeState, toggleDarkMode } from "@/redux/slices/clientThemeConfig";
+import { showSuccessToast } from "@/redux/slices/toast";
 import { Avatar, Button, Card, Layout, Popover, Space, Typography } from "antd";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { LuBell, LuCloudSunRain, LuLogOut, LuPen, LuUser } from 'react-icons/lu';
 import Styles from "./headerComponent.module.scss";
@@ -15,7 +17,7 @@ function HeaderComponent() {
     const pathname = usePathname()
     const dispatch = useAppDispatch()
     const isDarkMode = useAppSelector(getDarkModeState);
-
+    const router = useRouter()
     const currentpage = useCallback(
         () => {
             if (pathname == "/") return "Dashboard Page";
@@ -29,13 +31,22 @@ function HeaderComponent() {
         </Space>
     }
 
+
+
     const renderProfileContent = () => {
+
+        const onLogout = () => {
+            dispatch(setAuthUser(null));
+            dispatch(showSuccessToast("Logged out suuccessfully"))
+            router.push("/login")
+        }
+
         return <Space>
             <Card
                 style={{ width: 300 }}
                 actions={[
-                    <Text key="Edit"> <LuPen /> Edit</Text>,
-                    <Text key="Logout"> <LuLogOut /> Logout</Text>,
+                    <Text onClick={onLogout} key="Edit"> <LuPen /> Edit</Text>,
+                    <Text onClick={onLogout} key="Logout"> <LuLogOut /> Logout</Text>,
                 ]}
             >
                 <Meta
