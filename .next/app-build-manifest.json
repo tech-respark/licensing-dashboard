@@ -35,6 +35,45 @@
       "static/chunks/main-app.js",
       "static/css/app/(withoutLyaout)/login/page.css",
       "static/chunks/app/(withoutLyaout)/login/page.js"
+    ],
+    "/(withLayout)/dashboard/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withLayout)/dashboard/page.css",
+      "static/chunks/app/(withLayout)/dashboard/page.js"
+    ],
+    "/(withLayout)/sales/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(withLayout)/sales/page.js"
+    ],
+    "/(withLayout)/plans/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(withLayout)/plans/page.js"
+    ],
+    "/(withLayout)/reports/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/chunks/app/(withLayout)/reports/page.js"
+    ],
+    "/(withLayout)/modules/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withLayout)/modules/page.css",
+      "static/chunks/app/(withLayout)/modules/page.js"
+    ],
+    "/(withLayout)/users/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withLayout)/users/page.css",
+      "static/chunks/app/(withLayout)/users/page.js"
+    ],
+    "/(withLayout)/clients/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withLayout)/clients/page.css",
+      "static/chunks/app/(withLayout)/clients/page.js"
     ]
   }
 }
