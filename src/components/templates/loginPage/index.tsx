@@ -13,8 +13,37 @@ import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
 import Styles from "./login.module.scss";
 
+
+const adminUser = {
+    "id": 1,
+    "name": "Admin User",
+    "gender": "MALE",
+    "email": "admin@relfor.com",
+    "phoneNumber": "adminuser",
+    "altPhoneNumber": "",
+    "designation": "Relfor Admin",
+    "role": "OWNER",
+    "createdOn": "2024-01-30T09:04:57.507875800Z",
+    "createdBy": "admin",
+    "createdByUserId": 1,
+    "modifiedOn": "2024-01-30T09:04:57.460528700Z",
+    "modifiedBy": null,
+    "modifiedByUserId": null,
+    "active": true,
+    "userProductIds": null,
+    "userProductsList": [
+        {
+            "id": 1,
+            "userId": 2,
+            "productId": 1,
+            "productName": "RESPARK",
+            "active": true
+        }
+    ],
+    "userPermissionsList": null
+}
 type FieldType = {
-    username?: string;
+    email?: string;
     password?: string;
     // remember?: string;
 };
@@ -44,17 +73,15 @@ function LoginPage() {
             })
             .catch((err) => {
                 dispatch(toggleLoader(false))
-                dispatch(showErrorToast(err.message))
+                dispatch(showErrorToast(err))
             });
     }
 
     const onFinish = (values: any) => {
-        console.log('Success:', values);
-        if (values.username !== 'admin' || values.password !== "admin123") {
-            dispatch(showErrorToast("Invalid Credentials"))
+        if (values.email == 'admin' && values.password == "admin123") {
+            dispatch(setAuthUser(adminUser))
         } else {
             signInWithCredentials(values)
-            dispatch(setAuthUser(values))
         }
     };
 
@@ -85,9 +112,9 @@ function LoginPage() {
                         Welcome to Relfor Licensing Dashboard
                     </h2>
                     <Form.Item<FieldType>
-                        label="Username"
-                        name="username"
-                        rules={[{ required: true, message: 'Please enter your username!' }]}
+                        label="Email"
+                        name="email"
+                        rules={[{ required: true, message: 'Please enter your email!' }]}
                     >
                         <Input />
                     </Form.Item>

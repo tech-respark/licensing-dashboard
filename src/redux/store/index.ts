@@ -1,10 +1,11 @@
+import { STORAGE_KEY } from "@/constants/common";
 import { Action, ThunkAction, configureStore } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import rootReducer from "../slices";
 import storage from "./customStorage";
 
 const persistConfig = {
-  key: "relfor",
+  key: STORAGE_KEY,
   whitelist: ["auth", "clientThemeConfig"], // make sure it does not clash with server keys
   storage,
 };

@@ -1,13 +1,39 @@
 "use client"
-import { SaalesPersonsList } from "@/dummyData/sales";
+import { useAppSelector } from "@/hooks/useAppSelector";
+import { getUsersByProduct } from "@/lib/internalApi/user";
+import { getAuthUserState } from "@/redux/slices/auth";
 import { Button, Card, Space } from "antd";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import UserModal from "./userModal";
 import Styles from "./usersPage.module.scss";
 const { Meta } = Card;
 
 function UsersPage() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [modalData, setModalData] = useState({ active: false, user: null });
+    const [usersList, setUsersList] = useState<any[]>([]);
+    const userData = useAppSelector(getAuthUserState);
+
+    useEffect(() => {
+        getUsersByProduct(userData.userProductsList[0].productId).then((res: any) => {
+            if (res.data) setUsersList(res.data)
+        }).catch(function (error: any) {
+            console.log(`/getUsersByProduct `, error);
+        });
+    }, [])
+
+    const handleModalResponse = (data: any) => {
+        if (data?.id) {
+            const usersListCopy: any[] = [...usersList]
+            let index = usersList.findIndex((u: any) => u.id == data.id);
+            if (index == -1) {
+                usersListCopy.unshift(data);
+            } else {
+                usersListCopy[index] = data
+            }
+            setUsersList(usersListCopy)
+        }
+        setModalData({ active: false, user: null })
+    }
 
     return (
         <Space className={Styles.userpageWrap}
@@ -16,16 +42,24 @@ function UsersPage() {
             styles={{ item: { width: "100%" } }}
         >
             <Space align="end">
-                <Button size="large" type="primary" onClick={() => setIsModalOpen(true)}>Add New User</Button>
+                <Button size="large" type="primary" onClick={() => setModalData({ active: true, user: null })}>Add New User</Button>
             </Space>
             <Space className={Styles.usersList} wrap>
-                {SaalesPersonsList.map((salesDetails: any) => {
-                    return <Card key={salesDetails.key} title={salesDetails.name} extra={<Button type="dashed" onClick={() => setIsModalOpen(true)}>View</Button>} style={{ width: 300 }}>
-                        <Meta title={`Total Sale : ${salesDetails.total}`} description={`Client Onboarded ${salesDetails.count}`} />
+                {usersList.map((userDetails: any) => {
+                    return <Card
+                        // onClick={() => setModalData({ active: true, user: userDetails })}
+                        key={Math.random()}
+                        title={userDetails.name}
+                        style={{ width: 300 }}
+                        actions={[
+                            <Button onClick={() => setModalData({ active: true, user: userDetails })} key={Math.random()} >View Details</Button>
+                        ]}
+                    >
+                        <Meta title={userDetails.phoneNumber} description={`${userDetails.email}`} />
                     </Card>
                 })}
             </Space>
-            <UserModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            <UserModal modalData={modalData} handleModalResponse={handleModalResponse} />
         </Space>
     )
 }

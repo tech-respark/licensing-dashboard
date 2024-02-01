@@ -12,20 +12,18 @@
 .dashboardPage_dashboardWrapper__j5yYO::-webkit-scrollbar {
   display: none;
 }
+.dashboardPage_dashboardWrapper__j5yYO button {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
 .dashboardPage_dashboardWrapper__j5yYO .dashboardPage_tableHeader__QHbqo {
   display: flex;
   justify-content: space-between;
   align-items: center;
   padding-right: 10px;
+  padding: 10px;
 }
 .dashboardPage_dashboardWrapper__j5yYO .dashboardPage_tableHeader__QHbqo .dashboardPage_label__MSLst {
   font-size: 16px;
-}
-.dashboardPage_dashboardWrapper__j5yYO .dashboardPage_columnSettings__2HdlW {
-  width: 400px;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
 }

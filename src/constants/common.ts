@@ -1,3 +1,4 @@
+export const STORAGE_KEY = "relfor";
 
 export const LOGO_IMAGE = "https://static.wixstatic.com/media/79a88b_0f69e92af324428ea374e681bfec0e33~mv2.png/v1/fill/w_318,h_64,al_c,lg_1,q_85,enc_auto/79a88b_0f69e92af324428ea374e681bfec0e33~mv2.png"
 
@@ -16,3 +17,12 @@ export const DEFAULT_ALERT_TIME = 3000; //alert timeout timing
 
 export const DEFAULT_LIGHT_COLOR = '#002864';
 export const DEFAULT_DARK_COLOR = '#00C9A7';
+
+export const PRODUCTS_LIST = [
+    {
+        "id": 1,
+        "productId": 1,
+        "productName": "RESPARK",
+        "active": true
+    }
+]

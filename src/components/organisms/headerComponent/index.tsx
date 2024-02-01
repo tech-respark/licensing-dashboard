@@ -18,6 +18,7 @@ function HeaderComponent() {
     const dispatch = useAppDispatch()
     const isDarkMode = useAppSelector(getDarkModeState);
     const router = useRouter()
+
     const currentpage = useCallback(
         () => {
             if (pathname == "/") return "Dashboard Page";
@@ -31,13 +32,12 @@ function HeaderComponent() {
         </Space>
     }
 
-
-
     const renderProfileContent = () => {
 
         const onLogout = () => {
+            // localStorage.removeItem("persist:relfor")
             dispatch(setAuthUser(null));
-            dispatch(showSuccessToast("Logged out suuccessfully"))
+            dispatch(showSuccessToast("Logged out successfully"))
             router.push("/login")
         }
 

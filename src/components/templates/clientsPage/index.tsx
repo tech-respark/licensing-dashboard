@@ -1,9 +1,11 @@
 'use client'
 
-import { clientsList } from '@/dummyData/clients';
+import { useAppSelector } from '@/hooks/useAppSelector';
+import { getClientById, getClientsByProduct } from '@/lib/internalApi/clients';
+import { getAuthUserState } from '@/redux/slices/auth';
 import type { TableColumnsType, TableProps } from 'antd';
 import { Button, Card, Space, Table } from 'antd';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import ClientModal from './clientModal';
 import Styles from "./clientsPage.module.scss";
 
@@ -26,11 +28,9 @@ type Sorts = GetSingle<Parameters<OnChange>[2]>;
 
 function ClientsPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
-
-    const addClient = () => {
-        setIsModalOpen(true)
-    }
-
+    const [modalData, setModalData] = useState({ active: false, client: null });
+    const [clientsList, setClientsList] = useState<any[]>([]);
+    const userData = useAppSelector(getAuthUserState);
     const [filteredInfo, setFilteredInfo] = useState<Filters>({});
     const [sortedInfo, setSortedInfo] = useState<Sorts>({});
 
@@ -40,54 +40,73 @@ function ClientsPage() {
         setSortedInfo(sorter as Sorts);
     };
 
+
+    useEffect(() => {
+        getClientsByProduct(userData.userProductsList[0].productId).then((res: any) => {
+            if (res.data) setClientsList(res.data)
+        }).catch(function (error: any) {
+            console.log(`/getClientsByProduct `, error);
+        });
+    }, [])
+
+    const handleModalResponse = (data: any) => {
+        if (data?.id) {
+            const moduleListCopy: any[] = [...clientsList]
+            let index = clientsList.findIndex((u: any) => u.id == data.id);
+            if (index == -1) {
+                moduleListCopy.unshift(data);
+            } else {
+                moduleListCopy[index] = data
+            }
+            setClientsList(moduleListCopy)
+        }
+        setModalData({ active: false, client: null })
+    }
+
+
     const data: DataType[] = [...clientsList];
 
     const columns: TableColumnsType<DataType> = [
         {
             title: 'Business Name',
-            dataIndex: 'tenantName',
-            key: 'tenantName',
+            dataIndex: 'businessName',
+            key: 'businessName',
         },
         {
             title: 'Client Name',
-            dataIndex: 'clientName',
-            key: 'clientName',
+            dataIndex: 'name',
+            key: 'name',
         },
         {
             title: 'Number',
-            dataIndex: 'number',
-            key: 'number',
+            dataIndex: 'phoneNumber',
+            key: 'phoneNumber',
         },
         {
-            title: 'Stores',
-            dataIndex: 'stores',
-            key: 'stores',
+            title: 'Stores Count',
+            dataIndex: 'storeCount',
+            key: 'storeCount',
         },
         {
-            title: 'Date Onboarded',
-            dataIndex: 'date',
-            key: 'date',
-        },
-        {
-            title: 'Location',
-            dataIndex: 'location',
-            key: 'location',
-            filters: [
-                { text: 'Pune', value: 'Pune' },
-                { text: 'Mumbai', value: 'Mumbai' },
-                { text: 'Banglore', value: 'Banglore' },
-                { text: 'Dubai', value: 'Dubai' },
-            ],
-            filteredValue: filteredInfo.location || null,
-            onFilter: (value: any, record) => record.location.includes(value),
-            sorter: (a, b) => a.location.length - b.location.length,
-            sortOrder: sortedInfo.columnKey === 'location' ? sortedInfo.order : null,
+            title: 'Business Location',
+            dataIndex: 'businessAddress',
+            key: 'businessAddress',
+            // filters: [
+            //     { text: 'Pune', value: 'Pune' },
+            //     { text: 'Mumbai', value: 'Mumbai' },
+            //     { text: 'Banglore', value: 'Banglore' },
+            //     { text: 'Dubai', value: 'Dubai' },
+            // ],
+            // filteredValue: filteredInfo.location || null,
+            // onFilter: (value: any, record) => record.location.includes(value),
+            // sorter: (a, b) => a.location.length - b.location.length,
+            // sortOrder: sortedInfo.columnKey === 'location' ? sortedInfo.order : null,
             // ellipsis: true,
         },
         {
             title: 'Sales Person',
-            dataIndex: 'salesPerson',
-            key: 'salesPerson',
+            dataIndex: 'createdBy',
+            key: 'createdBy',
             filters: [
                 { text: 'Unnati', value: 'Unnati' },
                 { text: 'Mayank', value: 'Mayank' },
@@ -106,15 +125,27 @@ function ClientsPage() {
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title="All Clients List" extra={<Button type='primary' size='large' onClick={addClient}>Add New Client</Button>}>
+                <Card title="All Clients List" extra={<Space>
+                    <Button type='primary' size='large' onClick={() => setModalData({ active: true, client: null })}>Add New Client</Button>
+                </Space>}>
                     <Table
+                        onRow={(record: any, rowIndex: any) => {
+                            return {
+                                onClick: (event) => {
+                                    console.log(record)
+                                    getClientById(record.id).then((res: any) => {
+                                        setModalData({ active: true, client: res.data })
+                                    })
+                                }, // click row
+                            };
+                        }}
                         bordered
                         pagination={{ pageSize: 10 }}
                         scroll={{ x: 1500, y: 500 }}
                         columns={columns} dataSource={data} onChange={handleChange} />
                 </Card>
             </Space>
-            <ClientModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+            {modalData.active && <ClientModal modalData={modalData} handleModalResponse={handleModalResponse} />}
         </>
     )
 }

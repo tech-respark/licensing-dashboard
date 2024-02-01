@@ -4,6 +4,7 @@ import { salesList } from '@/dummyData/sales';
 import type { CheckboxOptionType, TableColumnsType, TableProps } from 'antd';
 import { Button, Card, Checkbox, Popover, Space, Table, Typography } from 'antd';
 import { useState } from 'react';
+import { LuColumns, LuFilter, LuPieChart } from 'react-icons/lu';
 import Styles from "./dashboardPage.module.scss";
 import SalesDetailsModal from './salesDetailsModal';
 import SalesPersonSale from './salesPersonSale';
@@ -29,6 +30,7 @@ function DashboardPage() {
     const [filteredInfo, setFilteredInfo] = useState<Filters>({});
     const [sortedInfo, setSortedInfo] = useState<Sorts>({});
     const [isModalOpen, setIsModalOpen] = useState(null);
+    const [chartView, setChartView] = useState(false)
 
     const handleChange: OnChange = (pagination, filters, sorter) => {
         console.log('Various parameters', pagination, filters, sorter);
@@ -122,7 +124,7 @@ function DashboardPage() {
 
     const options = columns.map(({ key, title }) => ({
         label: title,
-        value: key,
+        value: key
     }));
 
     const newColumns = columns.map((item) => ({
@@ -131,8 +133,15 @@ function DashboardPage() {
     }));
 
     const renderColumnsSettings = () => {
-        return <Space wrap style={{ width: 300 }} className={Styles.columnSettings}>
+        return <Space direction='vertical'>
             <Checkbox.Group
+                style={{
+                    display: "flex",
+                    justifyContent: "flex-start",
+                    alignItems: "flex-start",
+                    flexDirection: "column",
+                    gap: "10px"
+                }}
                 value={checkedList}
                 options={options as CheckboxOptionType[]}
                 onChange={(value) => {
@@ -144,18 +153,19 @@ function DashboardPage() {
 
     const renderHeaders = () => {
         return <Space className={Styles.tableHeader}>
+            <Button type='primary' onClick={() => setChartView(!chartView)} icon={<LuPieChart />}>{!chartView ? "Charts" : "Table"} View</Button>
             <Text className={Styles.label}>Sales Requests Table</Text>
-            <Popover title="Show/Hide Columns" content={renderColumnsSettings()}>
-                <Button>Columns</Button>
-            </Popover>
+            {chartView ? <Button disabled={true} icon={<LuColumns />}>Columns</Button> : <Popover title="Show or Hide Columns" content={renderColumnsSettings()}>
+                <Button disabled={chartView} icon={<LuColumns />}>Columns</Button>
+            </Popover>}
         </Space>
     }
 
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title={renderHeaders()} extra={<Button type='dashed' onClick={clearAll}>Clear Filters</Button>}>
-                    <Table
+                <Card title={renderHeaders()} extra={<Button type='dashed' icon={<LuFilter />} onClick={clearAll}>Filters</Button>}>
+                    {!chartView ? <Table
                         onRow={(record: any, rowIndex: any) => {
                             return {
                                 onClick: (event) => {
@@ -168,10 +178,11 @@ function DashboardPage() {
                         pagination={{ pageSize: 10 }}
                         scroll={{ x: 1500, y: 500 }}
                         columns={newColumns} dataSource={data} onChange={handleChange} />
-                </Card>
-
-                <Card title={"Sales Person Wise Sales"}>
-                    <SalesPersonSale />
+                        : <>
+                            {/* <Card title={"Sales Person Wise Sales"}>
+                            </Card> */}
+                            <SalesPersonSale />
+                        </>}
                 </Card>
             </Space>
             {Boolean(isModalOpen) && <SalesDetailsModal isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}
