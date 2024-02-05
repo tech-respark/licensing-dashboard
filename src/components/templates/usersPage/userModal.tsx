@@ -1,9 +1,10 @@
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
+import { getRolesByProduct } from "@/lib/internalApi/roles";
 import { createUser, updateUser } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
-import { Card, Checkbox, CheckboxOptionType, Form, Input, Modal, Space } from "antd";
+import { Card, Checkbox, Form, Input, Modal, Select, Space } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
 const { Meta } = Card;
 
@@ -24,9 +25,17 @@ const dummyUser = {
 
 function UserModal({ modalData, handleModalResponse }: any) {
     const [form] = Form.useForm();
-    console.log("modalData", modalData?.user?.active)
     const dispatch = useAppDispatch();
+    const [rolesList, setRolesList] = useState<any[]>([]);
     const userData = useAppSelector(getAuthUserState);
+
+    useEffect(() => {
+        getRolesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+            if (res.data) setRolesList(res.data)
+        }).catch(function (error: any) {
+            console.log(`/getRolesByProduct `, error);
+        });
+    }, [])
 
     interface FieldData {
         name: string | number | (string | number)[];
@@ -67,10 +76,6 @@ function UserModal({ modalData, handleModalResponse }: any) {
         value: key,
     }));
 
-    // console.log("defaultCheckedList", defaultCheckedList())
-    // console.log("checkedList", checkedList)
-    // console.log("option", options)
-
     const handleCancel = () => {
         handleModalResponse();
     };
@@ -79,30 +84,33 @@ function UserModal({ modalData, handleModalResponse }: any) {
 
     useEffect(() => {
         if (modalData.user) {
+            console.log(modalData.user)
             setFields([
+                { label: "Active", name: ["active"], value: modalData?.user?.active },
                 { label: "Name", name: ["name"], value: modalData?.user?.name },
                 { label: "Phone Number", name: ["phoneNumber"], value: modalData?.user?.phoneNumber },
                 { label: "Email", name: ["email"], value: modalData?.user?.email },
-                { label: "Alternate Phone Number", name: ["altPhoneNumber"], value: modalData?.user?.altPhoneNumber },
                 { label: "Password", name: ["password"], value: modalData?.user?.password },
+                { label: "Role", name: ["roleId"], value: modalData?.user?.roleId },
+                { label: "Alternate Number", name: ["altPhoneNumber"], value: modalData?.user?.altPhoneNumber },
                 { label: "Designation", name: ["designation"], value: modalData?.user?.designation },
-                { label: "Active", name: ["active"], value: modalData?.user?.active },
             ])
         } else {
             setFields([
+                { label: "Active", name: ["active"], value: true },
                 { label: "Name", name: ["name"], value: "" },
                 { label: "Phone Number", name: ["phoneNumber"], value: "" },
                 { label: "Email", name: ["email"], value: "" },
-                { label: "Alternate Phone Number", name: ["altPhoneNumber"], value: "" },
                 { label: "Password", name: ["password"], value: "" },
+                { label: "Role", name: ["roleId"], value: "" },
+                { label: "Alternate Number", name: ["altPhoneNumber"], value: "" },
                 { label: "Designation", name: ["designation"], value: "" },
-                { label: "Active", name: ["active"], value: true },
             ])
         }
     }, [modalData])
 
     const getPermissions = () => {
-        const permissionsListCopy: any = { productId: userData.userProductsList[0].productId };
+        const permissionsListCopy: any = { productId: userData?.userProductsList[0].productId };
         permissionsList.map((p: any) => {
             permissionsListCopy[p.key] = checkedList.includes(p.key) ? 1 : 0
         })
@@ -115,7 +123,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
             ...values,
             "userProductIds": "1",
             "gender": "MALE",
-            "userPermissionsList": [getPermissions()],
+            // "userPermissionsList": [getPermissions()],
         }
         console.log("final details", details)
         if (modalData?.user?.id) {
@@ -136,6 +144,10 @@ function UserModal({ modalData, handleModalResponse }: any) {
                 console.log(error)
                 dispatch(showErrorToast(`User creation failed.error: ${error}`))
             })
+    }
+
+    const getRolesOptions = () => {
+        return rolesList.filter((r: any) => r.roleName != "CEO").map((r: any) => ({ value: r.id, label: r.roleName }))
     }
 
     return (
@@ -168,19 +180,37 @@ function UserModal({ modalData, handleModalResponse }: any) {
                                         <Form.Item name={item.name} valuePropName="checked" noStyle>
                                             <Checkbox>{item.label}</Checkbox>
                                         </Form.Item> :
-                                        <Form.Item
+                                        item.label == "Role" ? <Form.Item
+                                            label="Role"
+                                            name="roleId"
+                                            rules={[{ required: true, message: `Please select role` }]}
+                                        >
+                                            <Select
+                                                showSearch
+                                                style={{ width: 200 }}
+                                                placeholder="Search to Select"
+                                                optionFilterProp="children"
+                                                filterOption={(input, option) => (option?.label ?? '').includes(input)}
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                }
+                                                options={getRolesOptions()}
+                                            />
+                                        </Form.Item> : <Form.Item
                                             label={item.label}
                                             name={item.name}
-                                            rules={[{ required: true, message: `Please enter your ${item.label}` }]}
+                                            rules={item.label == "Alternate Number" || item.label == "Designation" ? [] : [{ required: true, message: `Please enter your ${item.label}` }]}
                                         >
                                             <Input />
-                                        </Form.Item>}
+                                        </Form.Item>
+                                    }
                                 </React.Fragment>
                             })}
+
                         </Form>
                     </Card>
                 </Space>
-                <Card style={{ width: "100%" }}>
+                {/* <Card style={{ width: "100%" }}>
                     <Space direction="vertical">
                         <Meta title="User Permissions" />
                         <Checkbox.Group
@@ -191,7 +221,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
                             }}
                         />
                     </Space>
-                </Card>
+                </Card> */}
             </Space>
         </Modal>
     )

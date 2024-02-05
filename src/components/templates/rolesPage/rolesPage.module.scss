@@ -1,0 +1,11 @@
+.userpageWrap {
+    width: 100%;
+    height: 100%;
+    padding: 10px;
+
+    .rolesList {
+        display: flex;
+        justify-content: flex-start;
+        align-items: flex-start;
+    }
+}

@@ -38,7 +38,6 @@ const dummyClient = {
 
 function ClientModal({ modalData, handleModalResponse }: any) {
     const [form] = Form.useForm();
-    console.log("modalData", modalData?.client?.active)
     const dispatch = useAppDispatch();
     const userData = useAppSelector(getAuthUserState);
 
@@ -63,32 +62,32 @@ function ClientModal({ modalData, handleModalResponse }: any) {
             console.log("modalData?.client", modalData?.client)
             setFields([
                 { label: "Active", name: ["active"], value: modalData?.client.active },
-                { label: "Name", name: ["name"], value: modalData?.client.name },
+                { label: "Business Name", name: ["businessName"], value: modalData?.client.businessName },
+                { label: "Owner Name", name: ["name"], value: modalData?.client.name },
+                { label: "Business Type", name: ["businessType"], value: modalData?.client.businessType },
+                { label: "Business Address", name: ["businessAddress"], value: modalData?.client.businessAddress },
                 { label: "Phone Number", name: ["phoneNumber"], value: modalData?.client.phoneNumber },
                 { label: "Address", name: ["address"], value: modalData?.client.address },
                 { label: "Email", name: ["email"], value: modalData?.client.email },
-                { label: "Referral Source", name: ["referralSource"], value: modalData?.client.referralSource },
-                { label: "Business Name", name: ["businessName"], value: modalData?.client.businessName },
-                { label: "Business Type", name: ["businessType"], value: modalData?.client.businessType },
-                { label: "Business Address", name: ["businessAddress"], value: modalData?.client.businessAddress },
                 { label: "City", name: ["city"], value: modalData?.client.city },
                 { label: "State", name: ["state"], value: modalData?.client.state },
                 { label: "Country", name: ["country"], value: modalData?.client.country },
+                { label: "Referral or Source", name: ["referralSource"], value: modalData?.client.referralSource },
             ])
         } else {
             setFields([
                 { label: "Active", name: ["active"], value: true },
-                { label: "Name", name: ["name"], value: "" },
+                { label: "Business Name", name: ["businessName"], value: "" },
+                { label: "Owner Name", name: ["name"], value: "" },
+                { label: "Business Type", name: ["businessType"], value: "" },
+                { label: "Business Address", name: ["businessAddress"], value: "" },
                 { label: "Phone Number", name: ["phoneNumber"], value: "" },
                 { label: "Address", name: ["address"], value: "" },
                 { label: "Email", name: ["email"], value: "" },
                 { label: "City", name: ["city"], value: "" },
                 { label: "State", name: ["state"], value: "" },
                 { label: "Country", name: ["country"], value: "" },
-                { label: "Referral Source", name: ["referralSource"], value: "" },
-                { label: "Business Name", name: ["businessName"], value: "" },
-                { label: "Business Type", name: ["businessType"], value: "" },
-                { label: "Business Address", name: ["businessAddress"], value: "" },
+                { label: "Referral or Source", name: ["referralSource"], value: "" },
             ])
         }
     }, [modalData])
@@ -97,7 +96,7 @@ function ClientModal({ modalData, handleModalResponse }: any) {
         console.log(values)
         const details = {
             ...values,
-            productId: userData.userProductsList[0].productId
+            productId: userData?.userProductsList[0].productId
         }
         if (modalData?.client?.id) {
             details.id = modalData?.client?.id;
@@ -110,7 +109,9 @@ function ClientModal({ modalData, handleModalResponse }: any) {
         const api = modalData?.client?.id ? updateClient : createClient;
 
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("Client created successfuly."))
+            if(modalData?.client?.id) dispatch(showSuccessToast("Client updated successfully."))
+            else dispatch(showSuccessToast("Client created successfully."))
+
             handleModalResponse({ ...details, id: res?.data?.id })
         })
             .catch((error: any) => {
@@ -179,9 +180,14 @@ function ClientModal({ modalData, handleModalResponse }: any) {
                                                 extra={<LuX onClick={() => remove(field.name)} />}
                                             >
                                                 <Space wrap>
-                                                    <Form.Item name={[field.name, 'name']} rules={[{ required: true, message: `Please enter store name` }]}>
-                                                        <Input placeholder="name" />
-                                                    </Form.Item>
+                                                    <Space key={field.key}>
+                                                        <Form.Item name={[field.name, 'name']} rules={[{ required: true, message: `Please enter store name` }]}>
+                                                            <Input placeholder="name" />
+                                                        </Form.Item>
+                                                        <Form.Item name={[field.name, 'active']} valuePropName="checked" >
+                                                            <Checkbox>Active</Checkbox>
+                                                        </Form.Item>
+                                                    </Space>
 
                                                     <Space key={field.key}>
                                                         <Form.Item name={[field.name, 'email']}>

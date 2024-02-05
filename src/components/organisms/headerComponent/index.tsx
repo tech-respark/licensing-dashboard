@@ -1,7 +1,7 @@
 import NavigationMenus from "@/constants/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { setAuthUser } from "@/redux/slices/auth";
+import { getAuthUserState, setAuthUser } from "@/redux/slices/auth";
 import { getDarkModeState, toggleDarkMode } from "@/redux/slices/clientThemeConfig";
 import { showSuccessToast } from "@/redux/slices/toast";
 import { Avatar, Button, Card, Layout, Popover, Space, Typography } from "antd";
@@ -17,7 +17,8 @@ function HeaderComponent() {
     const pathname = usePathname()
     const dispatch = useAppDispatch()
     const isDarkMode = useAppSelector(getDarkModeState);
-    const router = useRouter()
+    const router = useRouter();
+    const userData = useAppSelector(getAuthUserState)
 
     const currentpage = useCallback(
         () => {
@@ -51,8 +52,8 @@ function HeaderComponent() {
             >
                 <Meta
                     avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
-                    title="Deepak Nathani"
-                    description="Logged in as CEO"
+                    title={userData?.name}
+                    description={`Logged in as ${userData.roleName}`}
                 />
             </Card>
         </Space>

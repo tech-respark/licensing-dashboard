@@ -14,7 +14,7 @@ function ModulePage() {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getModulesByProduct(userData.userProductsList[0].productId).then((res: any) => {
+        getModulesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
             if (res.data) setModulesList(res.data)
         }).catch(function (error: any) {
             console.log(`/getUsersByProduct `, error);
@@ -41,9 +41,7 @@ function ModulePage() {
             direction="vertical"
             styles={{ item: { width: "100%" } }}
         >
-            <Space align="end">
-                <Button size="large" type="primary" onClick={() => setModalData({ active: true, module: null })}>Add New Module</Button>
-            </Space>
+            <Button size="large" type="primary" onClick={() => setModalData({ active: true, module: null })}>Add New Module</Button>
             <Space className={Styles.moduleList} wrap>
                 {moduleList.map((moduleDetails: any) => {
                     return <Card

@@ -22,7 +22,7 @@ const adminUser = {
     "phoneNumber": "adminuser",
     "altPhoneNumber": "",
     "designation": "Relfor Admin",
-    "role": "OWNER",
+    "roleId": 13,
     "createdOn": "2024-01-30T09:04:57.507875800Z",
     "createdBy": "admin",
     "createdByUserId": 1,
@@ -65,8 +65,8 @@ function LoginPage() {
     const signInWithCredentials = async (values: any) => {
         dispatch(toggleLoader(true))
         getUserByCredentials(values)
-            .then((authUser: any) => {
-                dispatch(setAuthUser(authUser))
+            .then((response: any) => {
+                dispatch(setAuthUser(response.data))
                 dispatch(showSuccessToast("Perfect! You're signed in successfuly."))
                 router.push("/")
                 dispatch(toggleLoader(false))

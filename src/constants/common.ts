@@ -1,3 +1,11 @@
+export const DATE_FORMAT = 'YYYY-MM-DD';
+
+export const CUSTOM_PLAN_ID = 'CUSTOM';
+export const CEO_ROLE = 'CEO';
+export const HOS_ROLE = 'HOS';
+export const SUPPORT_ROLE = 'SUPPORT';
+export const SALES_PERSON_ROLE = 'Sales Person';
+
 export const STORAGE_KEY = "relfor";
 
 export const LOGO_IMAGE = "https://static.wixstatic.com/media/79a88b_0f69e92af324428ea374e681bfec0e33~mv2.png/v1/fill/w_318,h_64,al_c,lg_1,q_85,enc_auto/79a88b_0f69e92af324428ea374e681bfec0e33~mv2.png"
@@ -26,3 +34,27 @@ export const PRODUCTS_LIST = [
         "active": true
     }
 ]
+
+export const permissionsList = [
+    { key: "dashboard", value: true, title: "Dashboard" },
+    { key: "requestsDashboard", value: false, title: "Requests Dashboard" },
+    { key: "clientsDashboard", value: false, title: "Clients Dashboard" },
+    { key: "reportsDashboard", value: true, title: "Reports Dashboard" },
+    { key: "usersDashboard", value: true, title: "Users Dashboard" },
+]
+
+export const getDurationOptions = () => [
+    { label: "One Month", value: "monthlyPrice" },
+    { label: "One Quarter", value: "quarterlyPrice" },
+    { label: "Half Year", value: "halfYearlyPrice" },
+    { label: "One Year", value: "yearlyPrice" },
+]
+
+export const REQUEST_STATUSES = {
+    "INITIATED": "INITIATED",
+    "APPROVED_BY_HOS": "APPROVED_BY_HOS",
+    "REJECTED_BY_HOS": "REJECTED_BY_HOS",
+    "APPROVED_BY_CEO": "APPROVED_BY_CEO",
+    "REJECTED_BY_CEO": "REJECTED_BY_CEO",
+    "ONBOARDED": "ONBOARDED"
+}

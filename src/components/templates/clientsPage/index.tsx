@@ -42,7 +42,7 @@ function ClientsPage() {
 
 
     useEffect(() => {
-        getClientsByProduct(userData.userProductsList[0].productId).then((res: any) => {
+        getClientsByProduct(userData?.userProductsList[0].productId).then((res: any) => {
             if (res.data) setClientsList(res.data)
         }).catch(function (error: any) {
             console.log(`/getClientsByProduct `, error);
@@ -82,26 +82,15 @@ function ClientsPage() {
             dataIndex: 'phoneNumber',
             key: 'phoneNumber',
         },
-        {
-            title: 'Stores Count',
-            dataIndex: 'storeCount',
-            key: 'storeCount',
-        },
+        // {
+        //     title: 'Stores Count',
+        //     dataIndex: 'storeCount',
+        //     key: 'storeCount',
+        // },
         {
             title: 'Business Location',
             dataIndex: 'businessAddress',
             key: 'businessAddress',
-            // filters: [
-            //     { text: 'Pune', value: 'Pune' },
-            //     { text: 'Mumbai', value: 'Mumbai' },
-            //     { text: 'Banglore', value: 'Banglore' },
-            //     { text: 'Dubai', value: 'Dubai' },
-            // ],
-            // filteredValue: filteredInfo.location || null,
-            // onFilter: (value: any, record) => record.location.includes(value),
-            // sorter: (a, b) => a.location.length - b.location.length,
-            // sortOrder: sortedInfo.columnKey === 'location' ? sortedInfo.order : null,
-            // ellipsis: true,
         },
         {
             title: 'Sales Person',
@@ -139,9 +128,10 @@ function ClientsPage() {
                                 }, // click row
                             };
                         }}
+                        rowKey={(record) => record.id}
                         bordered
                         pagination={{ pageSize: 10 }}
-                        scroll={{ x: 1500, y: 500 }}
+                        // scroll={{ x: 1500, y: 500 }}
                         columns={columns} dataSource={data} onChange={handleChange} />
                 </Card>
             </Space>

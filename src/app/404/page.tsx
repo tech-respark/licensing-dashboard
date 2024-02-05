@@ -11,7 +11,7 @@ function NotFound() {
         <div className={styles.pageWrap}>
             <div className={styles.logoWrap}>
                 <Suspense fallback={<div>Loading</div>}>
-                    {LOGO_IMAGE}
+                    <img src={LOGO_IMAGE} />
                 </Suspense>
             </div>
             <div className={styles.hWrap}>

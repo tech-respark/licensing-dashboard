@@ -7,7 +7,7 @@ export const getUserByCredentials = (cred: any) => {
                 if (response?.data?.data) res(response.data);
                 else rej(response?.data?.message)
             }).catch(function (error: any) {
-                rej(error);
+                rej(error.message);
                 console.log(`/login `, error);
             });
     })
@@ -19,7 +19,7 @@ export const getUsersByProduct = (productId: any) => {
                 if (response.data) res(response.data);
                 else rej(response.data.message)
             }).catch(function (error: any) {
-                rej(error);
+                rej(error.message);
                 console.log(`/login `, error);
             });
     })
@@ -28,9 +28,10 @@ export const createUser = (userDetails: any) => {
     return new Promise((res, rej) => {
         axiosClient.POST(`${process.env.NEXT_PUBLIC_BASE_URL}/user`, userDetails)
             .then((response) => {
-                res(response);
+                if (response.data) res(response.data);
+                else rej(response.data.message)
             }).catch(function (error) {
-                rej(error);
+                rej(error.message);
                 console.log(`Error = ${process.env.NEXT_PUBLIC_UPDATE_ADDRESS}=>`, error);
             });
     })
@@ -40,9 +41,10 @@ export const updateUser = (userDetails: any) => {
     return new Promise((res, rej) => {
         axiosClient.PUT(`${process.env.NEXT_PUBLIC_BASE_URL}/user`, userDetails)
             .then((response) => {
-                res(response);
+                if (response.data) res(response.data);
+                else rej(response.data.message)
             }).catch(function (error) {
-                rej(error);
+                rej(error.message);
                 console.log(`Error = ${process.env.NEXT_PUBLIC_UPDATE_ADDRESS}=>`, error);
             });
     })

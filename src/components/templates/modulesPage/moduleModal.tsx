@@ -19,7 +19,6 @@ const DummyModule = {
 
 function ModuleModal({ modalData, handleModalResponse }: any) {
     const [form] = Form.useForm();
-    console.log("modalData", modalData?.module?.active)
     const dispatch = useAppDispatch();
     const userData = useAppSelector(getAuthUserState);
 
@@ -40,6 +39,7 @@ function ModuleModal({ modalData, handleModalResponse }: any) {
 
     useEffect(() => {
         if (modalData.module) {
+            //update case
             setFields([
                 { label: "Name", name: ["name"], value: modalData?.module?.name },
                 { label: "Monthly Price", name: ["monthlyPrice"], value: modalData?.module?.monthlyPrice },
@@ -49,6 +49,7 @@ function ModuleModal({ modalData, handleModalResponse }: any) {
                 { label: "Active", name: ["active"], value: modalData?.module?.active },
             ])
         } else {
+            //create new case
             setFields([
                 { label: "Name", name: ["name"], value: "" },
                 { label: "Monthly Price", name: ["monthlyPrice"], value: "" },
@@ -63,7 +64,7 @@ function ModuleModal({ modalData, handleModalResponse }: any) {
 
     const onCreate = (values: any) => {
 
-        const details = { ...values, productId: userData.userProductsList[0].productId }
+        const details = { ...values, productId: userData?.userProductsList[0].productId }
         if (modalData?.module?.id) {
             details.id = modalData?.module?.id;
             details.modifiedBy = userData.name;
@@ -91,8 +92,8 @@ function ModuleModal({ modalData, handleModalResponse }: any) {
                 form
                     .validateFields()
                     .then((values) => {
-                        form.resetFields();
                         onCreate(values);
+                        form.resetFields();
                     })
                     .catch((info) => {
                         console.log('Validate Failed:', info);

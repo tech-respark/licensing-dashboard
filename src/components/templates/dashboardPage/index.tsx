@@ -163,28 +163,31 @@ function DashboardPage() {
 
     return (
         <>
-            <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title={renderHeaders()} extra={<Button type='dashed' icon={<LuFilter />} onClick={clearAll}>Filters</Button>}>
+            <div className={Styles.dashboardWrapper} >
+                <Card title={renderHeaders()}
+                    extra={<Button type='dashed' icon={<LuFilter />}
+                        onClick={clearAll}>Filters</Button>}
+                    bodyStyle={{
+                        paddingBottom: 0
+                    }}
+                >
                     {!chartView ? <Table
                         onRow={(record: any, rowIndex: any) => {
                             return {
                                 onClick: (event) => {
                                     console.log(record)
                                     setIsModalOpen(record)
-                                }, // click row
+                                },
                             };
                         }}
                         bordered
+                        rowKey={(record) => record.id}
                         pagination={{ pageSize: 10 }}
-                        scroll={{ x: 1500, y: 500 }}
+                        // scroll={{ x: 1500, y: 500 }}
                         columns={newColumns} dataSource={data} onChange={handleChange} />
-                        : <>
-                            {/* <Card title={"Sales Person Wise Sales"}>
-                            </Card> */}
-                            <SalesPersonSale />
-                        </>}
+                        : <SalesPersonSale />}
                 </Card>
-            </Space>
+            </div>
             {Boolean(isModalOpen) && <SalesDetailsModal isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}
         </>
     );
