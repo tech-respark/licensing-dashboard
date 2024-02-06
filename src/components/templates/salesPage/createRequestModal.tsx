@@ -12,7 +12,6 @@ import React, { useEffect, useState } from "react";
 import ClientModal from "../clientsPage/clientModal";
 const { Text } = Typography;
 const { Meta } = Card;
-const { RangePicker } = DatePicker;
 
 const DummyModule = {
     "productId": 1,
@@ -49,7 +48,7 @@ const DummyModule = {
     ]
 }
 
-function CreateRequestModal({ modalData, handleModalResponse, clientsList, modulesList, usersList, setClientsList, rolesList }: any) {
+function CreateRequestModal({ modalData, handleModalResponse, clientsList, modulesList, usersList, setClientsList }: any) {
     const [form] = Form.useForm();
     const { token } = theme.useToken()
     const dispatch = useAppDispatch();
@@ -238,8 +237,8 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
             const listCopy: any[] = [...clientsList]
             listCopy.unshift(data);
             setClientsList(listCopy)
+            form.setFieldValue("client", data?.id)
         }
-        form.setFieldValue("client", data.id)
         setShowAddClientModal(false);
     }
 
@@ -274,13 +273,12 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         let action = "";
         let secondaryAction = "";
         let disabled = true;
-        const loggeinUserRoleData = rolesList.find((r: any) => r.id == userData.roleId);
         const currentStatus = Boolean(modalData?.request?.id) ? modalData?.request?.statusesList[modalData?.request?.statusesList.length - 1] : null;
         if (Boolean(currentStatus)) {
             switch (currentStatus.status) {
 
                 case REQUEST_STATUSES.INITIATED:
-                    if (loggeinUserRoleData.roleName == HOS_ROLE) {
+                    if (userData.roleName == HOS_ROLE) {
                         prmaryButtonText = "Approve";
                         action = REQUEST_STATUSES.APPROVED_BY_HOS;
                         secondaryAction = REQUEST_STATUSES.REJECTED_BY_HOS;
@@ -294,7 +292,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                     break;
 
                 case REQUEST_STATUSES.APPROVED_BY_HOS:
-                    if (loggeinUserRoleData.roleName == CEO_ROLE) {
+                    if (userData.roleName == CEO_ROLE) {
                         prmaryButtonText = "Approve";
                         action = REQUEST_STATUSES.APPROVED_BY_CEO;
                         secondaryAction = REQUEST_STATUSES.REJECTED_BY_CEO;
@@ -308,7 +306,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                     break;
 
                 case REQUEST_STATUSES.APPROVED_BY_CEO:
-                    if (loggeinUserRoleData.roleName == SUPPORT_ROLE) {
+                    if (userData.roleName == SUPPORT_ROLE) {
                         prmaryButtonText = "Mark Onboarded";
                         action = REQUEST_STATUSES.ONBOARDED;
                         disabled = false;
@@ -338,7 +336,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                     break;
             }
         } else {
-            if (loggeinUserRoleData.roleName == SALES_PERSON_ROLE) {
+            if (userData.roleName == SALES_PERSON_ROLE) {
                 prmaryButtonText = "Initiate"
                 disabled = false;
             }
@@ -496,6 +494,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                                             <Text>Select Start Date</Text>
                                             <Space>
                                                 <DatePicker
+                                                    allowClear={false}
                                                     defaultValue={dayjs(storeDetails?.startDate, DATE_FORMAT)}
                                                     inputReadOnly
                                                     format={DATE_FORMAT}
@@ -552,6 +551,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
 
                             <Descriptions column={1} title="Pricing Breakdown">
                                 <Descriptions.Item label="System Generated Total">{Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))}</Descriptions.Item>
+                                {Boolean(discountPercentage) && <Descriptions.Item label="Dicount">{Number(discountPercentage)} %</Descriptions.Item>}
                                 {Boolean(discountPercentage) && <Descriptions.Item label="Dicounted Amount">{((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed(2))).toFixed(2)}</Descriptions.Item>}
                                 <Descriptions.Item label="Amount To Pay">{(Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))) - Number((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed(2)))}</Descriptions.Item>
                             </Descriptions>

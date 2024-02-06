@@ -1,133 +1,83 @@
 'use client'
 
-import { salesList } from '@/dummyData/sales';
-import type { CheckboxOptionType, TableColumnsType, TableProps } from 'antd';
+import Loading from '@/app/loading';
+import { DATE_FORMAT } from '@/constants/common';
+import { useAppSelector } from '@/hooks/useAppSelector';
+import { getDashboardRequests, getRequestById } from '@/lib/internalApi/requests';
+import { getAuthUserState } from '@/redux/slices/auth';
+import type { CheckboxOptionType, TableProps } from 'antd';
 import { Button, Card, Checkbox, Popover, Space, Table, Typography } from 'antd';
-import { useState } from 'react';
-import { LuColumns, LuFilter, LuPieChart } from 'react-icons/lu';
+import dayjs from 'dayjs';
+import { useEffect, useState } from 'react';
+import { LuColumns, LuPieChart } from 'react-icons/lu';
+import { DataType, TABLE_COLUMNS } from './constant';
 import Styles from "./dashboardPage.module.scss";
+import Filters from './filters';
 import SalesDetailsModal from './salesDetailsModal';
 import SalesPersonSale from './salesPersonSale';
-const { Text } = Typography;
-interface DataType {
-    key: string;
-    productName: string;
-    tenantName: string;
-    clientName: string,
-    salesPerson: string,
-    stores: string;
-    price: number;
-    location: string;
-}
+const { Text, Title } = Typography;
 
 type OnChange = NonNullable<TableProps<DataType>['onChange']>;
-type Filters = Parameters<OnChange>[1];
 
-type GetSingle<T> = T extends (infer U)[] ? U : never;
-type Sorts = GetSingle<Parameters<OnChange>[2]>;
-
+export const INITIAL_FILTERS = {
+    "filters": [],
+    "productId": 1,
+    "userId": null,
+    "currentStatus": null,
+    "sortBy": "DESC",
+    "orderBy": "sellingPrice",
+    "fromDate": new Date(),
+    "toDate": new Date(),
+    "pageNumber": 1,
+    "recordsPerPage": 10,
+}
 function DashboardPage() {
-    const [filteredInfo, setFilteredInfo] = useState<Filters>({});
-    const [sortedInfo, setSortedInfo] = useState<Sorts>({});
+
     const [isModalOpen, setIsModalOpen] = useState(null);
-    const [chartView, setChartView] = useState(false)
+    const [chartView, setChartView] = useState(false);
+    const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
+    const userData = useAppSelector(getAuthUserState);
+    const [isLodaing, setIsLodaing] = useState(false)
+
+    const [filters, setFilters] = useState(INITIAL_FILTERS)
+
+    const fetchRequests = () => {
+        setIsLodaing(true)
+        getDashboardRequests(
+            {
+                ...filters,
+                fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
+                toDate: dayjs(filters.toDate).format(DATE_FORMAT)
+            }
+        ).then((res: any) => {
+            if (res.data) {
+                setSalesRequestsList(res.data)
+                setIsLodaing(false)
+            } else {
+                setSalesRequestsList([])
+                setIsLodaing(false)
+            }
+        })
+    }
+
+    useEffect(() => {
+        fetchRequests()
+    }, [filters])
 
     const handleChange: OnChange = (pagination, filters, sorter) => {
         console.log('Various parameters', pagination, filters, sorter);
-        setFilteredInfo(filters);
-        setSortedInfo(sorter as Sorts);
     };
 
-    const clearAll = () => {
-        setFilteredInfo({});
-        setSortedInfo({});
-    };
-
-    const data: DataType[] = [...salesList, ...salesList];
-
-    const columns: TableColumnsType<DataType> = [
-        {
-            title: 'Product Name',
-            dataIndex: 'productName',
-            key: 'productName',
-            filters: [
-                { text: 'Respark', value: 'Respark' },
-                { text: 'Demyto', value: 'Demyto' },
-            ],
-            filteredValue: filteredInfo.productName || null,
-            onFilter: (value: any, record: DataType) => record.productName.includes(value),
-            sorter: (a, b) => a.productName.length - b.productName.length,
-            sortOrder: sortedInfo.columnKey === 'productName' ? sortedInfo.order : null,
-            // ellipsis: true,
-        },
-        {
-            title: 'Business Name',
-            dataIndex: 'tenantName',
-            key: 'tenantName',
-        },
-        {
-            title: 'Stores',
-            dataIndex: 'stores',
-            key: 'stores',
-        },
-        {
-            title: 'Client Name',
-            dataIndex: 'clientName',
-            key: 'clientName',
-        },
-        {
-            title: 'Price',
-            dataIndex: 'price',
-            key: 'price',
-            sorter: (a, b) => a.price - b.price,
-            sortOrder: sortedInfo.columnKey === 'price' ? sortedInfo.order : null,
-            // ellipsis: true,
-        },
-        {
-            title: 'Location',
-            dataIndex: 'location',
-            key: 'location',
-            filters: [
-                { text: 'Pune', value: 'Pune' },
-                { text: 'Mumbai', value: 'Mumbai' },
-                { text: 'Banglore', value: 'Banglore' },
-                { text: 'Dubai', value: 'Dubai' },
-            ],
-            filteredValue: filteredInfo.location || null,
-            onFilter: (value: any, record) => record.location.includes(value),
-            sorter: (a, b) => a.location.length - b.location.length,
-            sortOrder: sortedInfo.columnKey === 'location' ? sortedInfo.order : null,
-            // ellipsis: true,
-        },
-        {
-            title: 'Sales Person',
-            dataIndex: 'salesPerson',
-            key: 'salesPerson',
-            filters: [
-                { text: 'Unnati', value: 'Unnati' },
-                { text: 'Mayank', value: 'Mayank' },
-                { text: 'Ashish', value: 'Ashish' },
-                { text: 'Kiara', value: 'Kiara' },
-                { text: 'Karishma', value: 'Karishma' },
-            ],
-            filteredValue: filteredInfo.salesPerson || null,
-            onFilter: (value: any, record: DataType) => record.salesPerson.includes(value),
-            sorter: (a, b) => a.salesPerson.length - b.salesPerson.length,
-            sortOrder: sortedInfo.columnKey === 'salesPerson' ? sortedInfo.order : null,
-            // ellipsis: true,
-        },
-    ];
-
-    const defaultCheckedList = columns.map((item) => item.key as string);
+    const defaultCheckedList = TABLE_COLUMNS.map((item) => item.key as string);
 
     const [checkedList, setCheckedList] = useState(defaultCheckedList);
 
-    const options = columns.map(({ key, title }) => ({
+    const options = TABLE_COLUMNS.map(({ key, title }) => ({
         label: title,
         value: key
     }));
 
-    const newColumns = columns.map((item) => ({
+    const newColumns = TABLE_COLUMNS.map((item) => ({
         ...item,
         hidden: !checkedList.includes(item.key as string),
     }));
@@ -153,7 +103,7 @@ function DashboardPage() {
 
     const renderHeaders = () => {
         return <Space className={Styles.tableHeader}>
-            <Button type='primary' onClick={() => setChartView(!chartView)} icon={<LuPieChart />}>{!chartView ? "Charts" : "Table"} View</Button>
+            <Button type='primary' onClick={() => setChartView(!chartView)} icon={<LuPieChart />}>{!chartView ? "Chart" : "Table"} View</Button>
             <Text className={Styles.label}>Sales Requests Table</Text>
             {chartView ? <Button disabled={true} icon={<LuColumns />}>Columns</Button> : <Popover title="Show or Hide Columns" content={renderColumnsSettings()}>
                 <Button disabled={chartView} icon={<LuColumns />}>Columns</Button>
@@ -165,18 +115,22 @@ function DashboardPage() {
         <>
             <div className={Styles.dashboardWrapper} >
                 <Card title={renderHeaders()}
-                    extra={<Button type='dashed' icon={<LuFilter />}
-                        onClick={clearAll}>Filters</Button>}
+                    extra={<Filters setInitialFilters={setFilters} initialFilters={filters} />}
                     bodyStyle={{
                         paddingBottom: 0
                     }}
                 >
                     {!chartView ? <Table
-                        onRow={(record: any, rowIndex: any) => {
+                        onRow={(record: any) => {
                             return {
-                                onClick: (event) => {
+                                onClick: () => {
                                     console.log(record)
-                                    setIsModalOpen(record)
+                                    setIsLodaing(true);
+                                    getRequestById(record.saleId).then((res: any) => {
+                                        setIsLodaing(false);
+                                        console.log("original request", res.data)
+                                        setIsModalOpen({ ...res.data, saleSummary: record })
+                                    })
                                 },
                             };
                         }}
@@ -184,11 +138,12 @@ function DashboardPage() {
                         rowKey={(record) => record.id}
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={newColumns} dataSource={data} onChange={handleChange} />
+                        columns={newColumns} dataSource={salesRequestsList} onChange={handleChange} />
                         : <SalesPersonSale />}
                 </Card>
             </div>
             {Boolean(isModalOpen) && <SalesDetailsModal isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}
+            {isLodaing && <Loading />}
         </>
     );
 }

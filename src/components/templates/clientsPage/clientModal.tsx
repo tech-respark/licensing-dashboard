@@ -102,6 +102,7 @@ function ClientModal({ modalData, handleModalResponse }: any) {
             details.id = modalData?.client?.id;
             details.modifiedBy = userData.name;
             details.modifiedByUserId = userData.id;
+            details.storeCount = modalData?.client?.storeCount;
         } else {
             details.createdBy = userData.name;
             details.createdByUserId = userData.id;
@@ -109,7 +110,7 @@ function ClientModal({ modalData, handleModalResponse }: any) {
         const api = modalData?.client?.id ? updateClient : createClient;
 
         api(details).then((res: any) => {
-            if(modalData?.client?.id) dispatch(showSuccessToast("Client updated successfully."))
+            if (modalData?.client?.id) dispatch(showSuccessToast("Client updated successfully."))
             else dispatch(showSuccessToast("Client created successfully."))
 
             handleModalResponse({ ...details, id: res?.data?.id })

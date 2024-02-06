@@ -2,7 +2,7 @@ import { LuBarChartBig, LuContact, LuLayoutList, LuPieChart, LuServerCog, LuUser
 
 const NavigationMenus = [
     { name: "Dashboard", route: "/dashboard", icon: LuPieChart, label: "Dashboard Page" },
-    { name: "Sales", route: "/sales", icon: LuLayoutList, label: "Sales Page" },
+    { name: "Sales Dashboard", route: "/sales", icon: LuLayoutList, label: "Sales Page" },
     { name: "Clients", route: "/clients", icon: LuContact, label: "Clients Page" },
     { name: "Reports", route: "/reports", icon: LuBarChartBig, label: "Reports Page" },
     { name: "Role", route: "/roles", icon: LuUserCog, label: "Plans Page" },

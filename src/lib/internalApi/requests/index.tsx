@@ -20,6 +20,18 @@ export const getAllRequests = () => {
     })
 }
 
+export const getDashboardRequests = (filters: any) => {
+    return new Promise((res, rej) => {
+        axiosClient.POST(`${process.env.NEXT_PUBLIC_BASE_URL}/saleRequestsDetails`, filters)
+            .then((response: any) => {
+                if (response.data) res(response.data);
+                else rej(response.data.message)
+            }).catch(function (error: any) {
+                rej(error.message);
+                console.log(`/login `, error);
+            });
+    })
+}
 
 export const getRequestById = (requestId: any) => {
     return new Promise((res, rej) => {

@@ -1,9 +1,9 @@
 import { SaalesPersonsList } from '@/dummyData/sales';
 import { Pie } from '@ant-design/plots';
+// import { useEffect } from 'react';
 
 
 function SalesPersonSale() {
-
     const config = {
         appendPadding: 10,
         data: SaalesPersonsList,

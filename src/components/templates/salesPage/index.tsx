@@ -5,7 +5,6 @@ import { useAppSelector } from "@/hooks/useAppSelector";
 import { getClientsByProduct } from "@/lib/internalApi/clients";
 import { getModulesByProduct } from "@/lib/internalApi/module";
 import { getAllRequests, getRequestById } from "@/lib/internalApi/requests";
-import { getRolesByProduct } from "@/lib/internalApi/roles";
 import { getUsersByProduct } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import type { TableColumnsType, TableProps } from 'antd';
@@ -55,23 +54,35 @@ type OnChange = NonNullable<TableProps<DataType>['onChange']>;
 
 function SalesPage() {
 
-    const [requestList, setRequestList] = useState<any[]>([]);
     const userData = useAppSelector(getAuthUserState);
     const [modalData, setModalData] = useState({ active: false, request: null });
     const [clientsList, setClientsList] = useState<any[]>([]);
     const [modulesList, setModulesList] = useState<any[]>([]);
     const [usersList, setUsersList] = useState<any[]>([]);
-    const [rolesList, setRolesList] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false)
+    const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
+
+    const [filters, setFilters] = useState({
+        "filters": [],
+        "productId": userData?.userProductsList[0].productId,
+        "userId": null,
+        "currentStatus": null,
+        "sortBy": "DESC",
+        "orderBy": "sellingPrice",
+        "fromDate": null,
+        "toDate": null,
+        "pageNumber": 1,
+        "recordsPerPage": 10,
+    })
+
     const fetchBaseData = () => {
         return new Promise((res: any, rej: any) => {
-            if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0 && rolesList.length != 0) {
+            if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0) {
                 res(true)
             } else {
                 let clientsList: any = [];
                 let usersList: any = [];
                 let modulesList: any = [];
-                let rolesList: any = [];
 
                 getClientsByProduct(userData?.userProductsList[0].productId).then((res: any) => {
                     if (res.data) clientsList = res.data;
@@ -80,14 +91,7 @@ function SalesPage() {
                 });
 
                 getUsersByProduct(userData?.userProductsList[0].productId).then((res: any) => {
-                    //remove this logic after rolename comming in loggedinuser obj
-                    if (res.data) usersList = res.data.filter((u: any) => u.roleId == 13);
-                    //remove this logic after rolename comming in loggedinuser obj
-
-                    //enable this logic after rolename comming in loggedinuser obj
-                    if (res.data && false) usersList = res.data.filter((u: any) => u.roleName == SALES_PERSON_ROLE);
-                    //enable this logic after rolename comming in loggedinuser obj
-
+                    if (res.data) usersList = res.data.filter((u: any) => u.roleName == SALES_PERSON_ROLE);
                 }).catch(function (error: any) {
                     console.log(`/getUsersByProduct `, error);
                 });
@@ -96,17 +100,11 @@ function SalesPage() {
                 }).catch(function (error: any) {
                     console.log(`/getModulesByProduct `, error);
                 });
-                getRolesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
-                    if (res.data) rolesList = res.data;
-                }).catch(function (error: any) {
-                    console.log(`/getRolesByProduct `, error);
-                });
                 const dataInterval = setInterval(() => {
-                    if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0 && rolesList.length != 0) {
+                    if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0) {
                         setClientsList(clientsList)
                         setUsersList(usersList)
                         setModulesList(modulesList)
-                        setRolesList(rolesList)
                         clearInterval(dataInterval);
                         res(true)
                     }
@@ -115,21 +113,19 @@ function SalesPage() {
         })
     }
 
-    const fetchAllRequestsList = () => {
+    const fetchRequests = () => {
         getAllRequests().then((res: any) => {
-            if (res.data) setRequestList(res.data)
-        }).catch(function (error: any) {
-            console.log(`/getUsersByProduct `, error);
-        });
+            if (res.data) {
+                setSalesRequestsList(res.data)
+            }
+        })
     }
 
     useEffect(() => {
-        fetchAllRequestsList()
+        fetchRequests()
     }, [])
 
-
-    const data: DataType[] = [...requestList];
-
+    const data: DataType[] = [...salesRequestsList];
     const columns: TableColumnsType<DataType> = [
         {
             title: 'Business Name',
@@ -159,16 +155,15 @@ function SalesPage() {
     ];
 
     const handleModalResponse = (data: any) => {
-        // fetchAllRequestsList()
         if (data?.id) {
-            const listCopy: any[] = [...requestList]
-            let index = requestList.findIndex((u: any) => u.id == data.id);
+            const listCopy: any[] = [...salesRequestsList]
+            let index = salesRequestsList.findIndex((u: any) => u.id == data.id);
             if (index == -1) {
                 listCopy.unshift(data);
             } else {
                 listCopy[index] = data
             }
-            setRequestList(listCopy)
+            setSalesRequestsList(listCopy)
         }
         setModalData({ active: false, request: null })
     }
@@ -215,7 +210,6 @@ function SalesPage() {
                 modulesList={modulesList}
                 usersList={usersList}
                 modalData={modalData}
-                rolesList={rolesList}
                 setClientsList={setClientsList}
                 handleModalResponse={handleModalResponse} />}
         </>

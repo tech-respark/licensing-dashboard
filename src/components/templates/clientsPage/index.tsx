@@ -82,11 +82,11 @@ function ClientsPage() {
             dataIndex: 'phoneNumber',
             key: 'phoneNumber',
         },
-        // {
-        //     title: 'Stores Count',
-        //     dataIndex: 'storeCount',
-        //     key: 'storeCount',
-        // },
+        {
+            title: 'Stores Count',
+            dataIndex: 'storeCount',
+            key: 'storeCount',
+        },
         {
             title: 'Business Location',
             dataIndex: 'businessAddress',

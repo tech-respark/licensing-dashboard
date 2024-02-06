@@ -17,10 +17,36 @@
         align-items: center;
         padding-right: 10px;
         padding: 10px;
-
+        padding-left: 0;
 
         .label {
             font-size: 16px;
         }
+    }
+
+}
+
+.filtersTitle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.filterWrap {
+    width: 100%;
+
+    .actionsButtons {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
     }
 }

@@ -1,5 +1,7 @@
-export const DATE_FORMAT = 'YYYY-MM-DD';
+import dayjs from "dayjs";
 
+export const DATE_FORMAT = 'YYYY-MM-DD';
+export const TODAYS_DATE = dayjs(dayjs()).format(DATE_FORMAT)
 export const CUSTOM_PLAN_ID = 'CUSTOM';
 export const CEO_ROLE = 'CEO';
 export const HOS_ROLE = 'HOS';

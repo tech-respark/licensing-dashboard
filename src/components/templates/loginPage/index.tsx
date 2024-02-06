@@ -22,7 +22,7 @@ const adminUser = {
     "phoneNumber": "adminuser",
     "altPhoneNumber": "",
     "designation": "Relfor Admin",
-    "roleId": 13,
+    "roleName": "ADMIN",
     "createdOn": "2024-01-30T09:04:57.507875800Z",
     "createdBy": "admin",
     "createdByUserId": 1,
@@ -78,11 +78,11 @@ function LoginPage() {
     }
 
     const onFinish = (values: any) => {
-        if (values.email == 'admin' && values.password == "admin123") {
-            dispatch(setAuthUser(adminUser))
-        } else {
-            signInWithCredentials(values)
+        if (values.email == 'admin') {
+            values.email = "admin@relfor.com"
+            // dispatch(setAuthUser(adminUser))
         }
+        signInWithCredentials(values)
     };
 
     const onFinishFailed = (errorInfo: any) => {
