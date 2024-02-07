@@ -1,5 +1,6 @@
 'use client'
 import { ADMIN_ROLE, CEO_ROLE, LOGO_IMAGE } from '@/constants/common';
+import NavigationMenus from '@/constants/navigation';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getAuthUserState } from '@/redux/slices/auth';
 import type { MenuProps } from 'antd';
@@ -18,7 +19,7 @@ function SidebarComponent({ collapsed, setCollapsed }: any) {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        [...navigations].map((nav: any) => {
+        [...NavigationMenus].map((nav: any) => {
             if (nav.name == "Dashboard" && !(userData.roleName == CEO_ROLE || userData.roleName == ADMIN_ROLE)) nav.active = false;
             else nav.active = true;
         })
@@ -30,7 +31,7 @@ function SidebarComponent({ collapsed, setCollapsed }: any) {
         return { key, icon, children, label, } as MenuItem;
     }
 
-    const items: MenuItem[] = navigations.map((navItem: any) => getItem(navItem.name, navItem.route, <navItem.icon />))
+    const items: MenuItem[] = NavigationMenus.map((navItem: any) => getItem(navItem.name, navItem.route, <navItem.icon />))
 
     const onSelectNavigation = (selected: any) => {
         router.push(selected)
