@@ -81,7 +81,7 @@ function SalesDetailsModal({ isModalOpen, setIsModalOpen, salesDetails, handleMo
                                     <Descriptions.Item label="Module List">
                                         <Space >
                                             {storeDetails.modulesList.map((moduleDetails: any, mi: number) => {
-                                                return <Fragment>
+                                                return <Fragment key={mi}>
                                                     <Text>{moduleDetails.moduleName}</Text>
                                                 </Fragment>
                                             })}

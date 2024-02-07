@@ -3,8 +3,5 @@
   "/page": "app/page.js",
   "/(withLayout)/users/page": "app/(withLayout)/users/page.js",
   "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
-  "/(withLayout)/roles/page": "app/(withLayout)/roles/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
-  "/(withLayout)/clients/page": "app/(withLayout)/clients/page.js"
+  "/(withLayout)/roles/page": "app/(withLayout)/roles/page.js"
 }
