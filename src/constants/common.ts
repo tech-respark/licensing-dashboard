@@ -5,6 +5,7 @@ export const TODAYS_DATE = dayjs(dayjs()).format(DATE_FORMAT)
 export const CUSTOM_PLAN_ID = 'CUSTOM';
 export const CEO_ROLE = 'CEO';
 export const HOS_ROLE = 'HOS';
+export const ADMIN_ROLE = 'ADMIN';
 export const SUPPORT_ROLE = 'SUPPORT';
 export const SALES_PERSON_ROLE = 'Sales Person';
 
@@ -54,9 +55,18 @@ export const getDurationOptions = () => [
 
 export const REQUEST_STATUSES = {
     "INITIATED": "INITIATED",
+
+    "APPROVED_BY_ADMIN": "APPROVED_BY_ADMIN",
+    "REJECTED_BY_ADMIN": "REJECTED_BY_ADMIN",
+    "NIGOTIATE_BY_ADMIN": "NIGOTIATE_BY_ADMIN",
+
     "APPROVED_BY_HOS": "APPROVED_BY_HOS",
     "REJECTED_BY_HOS": "REJECTED_BY_HOS",
+    "NIGOTIATE_BY_HOS": "NIGOTIATE_BY_HOS",
+
+    "NIGOTIATE_BY_CEO": "NIGOTIATE_BY_CEO",
     "APPROVED_BY_CEO": "APPROVED_BY_CEO",
     "REJECTED_BY_CEO": "REJECTED_BY_CEO",
+
     "ONBOARDED": "ONBOARDED"
 }

@@ -1,4 +1,4 @@
-import { REQUEST_STATUSES, SALES_PERSON_ROLE } from '@/constants/common';
+import { ADMIN_ROLE, CEO_ROLE, HOS_ROLE, REQUEST_STATUSES, SALES_PERSON_ROLE } from '@/constants/common';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getUsersByProduct } from '@/lib/internalApi/user';
 import { getAuthUserState } from '@/redux/slices/auth';
@@ -83,7 +83,7 @@ function Filters({ initialFilters, setInitialFilters }: any) {
                 />
             </Space>
 
-            <Space direction='vertical'>
+            {(userData?.roleName == CEO_ROLE || userData?.roleName == HOS_ROLE || userData?.roleName == ADMIN_ROLE) && <Space direction='vertical'>
                 <Text>Sales Persons</Text>
                 <Select
                     allowClear
@@ -99,7 +99,7 @@ function Filters({ initialFilters, setInitialFilters }: any) {
                     onChange={(value: any) => setFilters({ ...filters, userId: value })}
                     options={salesPersonsList}
                 />
-            </Space>
+            </Space>}
 
             <Divider style={{ margin: 10 }} />
 

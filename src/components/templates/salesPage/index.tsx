@@ -1,17 +1,33 @@
 "use client"
 import Loading from "@/app/loading";
-import { SALES_PERSON_ROLE } from "@/constants/common";
+import { DATE_FORMAT, SALES_PERSON_ROLE } from "@/constants/common";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { getClientsByProduct } from "@/lib/internalApi/clients";
 import { getModulesByProduct } from "@/lib/internalApi/module";
 import { getAllRequests, getRequestById } from "@/lib/internalApi/requests";
 import { getUsersByProduct } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
-import type { TableColumnsType, TableProps } from 'antd';
+import type { TableProps } from 'antd';
 import { Button, Card, Space, Table } from "antd";
+import dayjs from "dayjs";
 import { useEffect, useState } from "react";
+import Filters from "../dashboardPage/filters";
+import { TABLE_COLUMNS } from "./constant";
 import CreateRequestModal from "./createRequestModal";
 import Styles from "./salespage.module.scss";
+
+export const INITIAL_FILTERS = {
+    "filters": [],
+    "productId": 1,
+    "userId": null,
+    "currentStatus": null,
+    "sortBy": "DESC",
+    "orderBy": "sellingPrice",
+    "fromDate": new Date(),
+    "toDate": new Date(),
+    "pageNumber": 1,
+    "recordsPerPage": 10,
+}
 
 const dummyRequest = {
     "id": 30,
@@ -61,19 +77,7 @@ function SalesPage() {
     const [usersList, setUsersList] = useState<any[]>([]);
     const [isLoading, setIsLoading] = useState(false)
     const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
-
-    const [filters, setFilters] = useState({
-        "filters": [],
-        "productId": userData?.userProductsList[0].productId,
-        "userId": null,
-        "currentStatus": null,
-        "sortBy": "DESC",
-        "orderBy": "sellingPrice",
-        "fromDate": null,
-        "toDate": null,
-        "pageNumber": 1,
-        "recordsPerPage": 10,
-    })
+    const [filters, setFilters] = useState(INITIAL_FILTERS)
 
     const fetchBaseData = () => {
         return new Promise((res: any, rej: any) => {
@@ -114,7 +118,13 @@ function SalesPage() {
     }
 
     const fetchRequests = () => {
-        getAllRequests().then((res: any) => {
+        setIsLoading(true)
+        getAllRequests({
+            ...filters,
+            fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
+            toDate: dayjs(filters.toDate).format(DATE_FORMAT)
+        }).then((res: any) => {
+            setIsLoading(false)
             if (res.data) {
                 setSalesRequestsList(res.data)
             }
@@ -123,63 +133,44 @@ function SalesPage() {
 
     useEffect(() => {
         fetchRequests()
-    }, [])
+    }, [filters])
 
     const data: DataType[] = [...salesRequestsList];
-    const columns: TableColumnsType<DataType> = [
-        {
-            title: 'Business Name',
-            dataIndex: 'tenantName',
-            key: 'tenantName',
-        },
-        {
-            title: 'Sales Person',
-            dataIndex: 'salesPersonName',
-            key: 'salesPersonName'
-        },
-        {
-            title: 'Selling Price',
-            dataIndex: 'sellingPrice',
-            key: 'sellingPrice'
-        },
-        {
-            title: 'Discount',
-            dataIndex: 'discountPercentage',
-            key: 'discountPercentage'
-        },
-        {
-            title: 'Status',
-            dataIndex: 'currentStatus',
-            key: 'currentStatus'
-        },
-    ];
 
     const handleModalResponse = (data: any) => {
-        if (data?.id) {
-            const listCopy: any[] = [...salesRequestsList]
-            let index = salesRequestsList.findIndex((u: any) => u.id == data.id);
-            if (index == -1) {
-                listCopy.unshift(data);
-            } else {
-                listCopy[index] = data
-            }
-            setSalesRequestsList(listCopy)
-        }
+        // if (data?.id) {
+        //     const listCopy: any[] = [...salesRequestsList]
+        //     let index = salesRequestsList.findIndex((u: any) => u.id == data.id);
+        //     if (index == -1) {
+        //         listCopy.unshift(data);
+        //     } else {
+        //         listCopy[index] = data
+        //     }
+        //     setSalesRequestsList(listCopy)
+        // }
+        fetchRequests()
         setModalData({ active: false, request: null })
     }
+
+    const handleChange: OnChange = (pagination: any) => {
+        console.log('Various parameters', pagination);
+        setFilters({ ...filters, pageNumber: pagination.current })
+    };
 
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title="All Sales List" extra={<Space>
-                    <Button type='primary' size='large' onClick={() => {
-                        setIsLoading(true);
-                        fetchBaseData().then(() => {
-                            setIsLoading(false);
-                            setModalData({ active: true, request: null })
-                        })
-                    }}>Add New Request</Button>
-                </Space>}>
+                <Card title="All Sales List" extra={
+                    <Space>
+                        <Button type='primary' onClick={() => {
+                            setIsLoading(true);
+                            fetchBaseData().then(() => {
+                                setIsLoading(false);
+                                setModalData({ active: true, request: null })
+                            })
+                        }}>Add New Request</Button>
+                        <Filters setInitialFilters={setFilters} initialFilters={filters} />
+                    </Space>}>
                     <Table
                         onRow={(record: any) => {
                             return {
@@ -199,8 +190,8 @@ function SalesPage() {
                         bordered
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={columns} dataSource={data}
-                    //  onChange={handleChange} 
+                        columns={TABLE_COLUMNS()} dataSource={data}
+                        onChange={handleChange}
                     />
                 </Card>
             </Space>

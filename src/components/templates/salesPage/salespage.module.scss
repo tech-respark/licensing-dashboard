@@ -5,6 +5,12 @@
     overflow: auto;
     @include hide-scrollbar;
 
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
     .tableHeader {
         display: flex;
         justify-content: space-between;
@@ -25,4 +31,29 @@
         gap: 20px;
     }
 
+}
+
+.filtersTitle {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+
+    button {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+}
+
+.filterWrap {
+    width: 100%;
+
+    .actionsButtons {
+        width: 100%;
+        display: flex;
+        justify-content: flex-end;
+        align-items: flex-end;
+    }
 }

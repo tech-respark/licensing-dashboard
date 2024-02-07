@@ -76,7 +76,7 @@ function ModuleModal({ modalData, handleModalResponse }: any) {
         const api = modalData?.module?.id ? updateModule : createModule;
 
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("Module created successfuly."))
+            dispatch(showSuccessToast("Module created successfully."))
             handleModalResponse({ ...details, id: res?.data?.id || Math.random() })
         })
             .catch((error: any) => {

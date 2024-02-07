@@ -136,7 +136,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
         }
         const api = modalData?.user?.id ? updateUser : createUser;
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("User created successfuly."))
+            dispatch(showSuccessToast("User created successfully."))
             handleModalResponse({ ...details, id: res?.data?.id || Math.random() })
             form.resetFields();
         })

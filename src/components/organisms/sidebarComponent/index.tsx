@@ -1,10 +1,11 @@
 'use client'
-import { LOGO_IMAGE } from '@/constants/common';
-import NavigationMenus from '@/constants/navigation';
+import { ADMIN_ROLE, CEO_ROLE, LOGO_IMAGE } from '@/constants/common';
+import { useAppSelector } from '@/hooks/useAppSelector';
+import { getAuthUserState } from '@/redux/slices/auth';
 import type { MenuProps } from 'antd';
 import { Layout, Menu } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import Styles from './sidebar.module.scss';
 const { Sider } = Layout;
 
@@ -13,12 +14,23 @@ function SidebarComponent({ collapsed, setCollapsed }: any) {
     const router = useRouter()
     const pathname = usePathname()
     type MenuItem = Required<MenuProps>['items'][number];
+    const [navigations, setNavigations] = useState([]);
+    const userData = useAppSelector(getAuthUserState);
+
+    useEffect(() => {
+        [...navigations].map((nav: any) => {
+            if (nav.name == "Dashboard" && !(userData.roleName == CEO_ROLE || userData.roleName == ADMIN_ROLE)) nav.active = false;
+            else nav.active = true;
+        })
+        setNavigations(navigations.filter((n: any) => n.active));
+    }, [])
+
 
     function getItem(label: React.ReactNode, key: React.Key, icon?: React.ReactNode, children?: MenuItem[],): MenuItem {
         return { key, icon, children, label, } as MenuItem;
     }
 
-    const items: MenuItem[] = NavigationMenus.map((navItem: any) => getItem(navItem.name, navItem.route, <navItem.icon />))
+    const items: MenuItem[] = navigations.map((navItem: any) => getItem(navItem.name, navItem.route, <navItem.icon />))
 
     const onSelectNavigation = (selected: any) => {
         router.push(selected)

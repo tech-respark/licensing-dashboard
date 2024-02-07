@@ -1,16 +1,17 @@
 'use client'
 
 import Loading from '@/app/loading';
-import { DATE_FORMAT } from '@/constants/common';
+import { ADMIN_ROLE, CEO_ROLE, DATE_FORMAT } from '@/constants/common';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getDashboardRequests, getRequestById } from '@/lib/internalApi/requests';
 import { getAuthUserState } from '@/redux/slices/auth';
 import type { CheckboxOptionType, TableProps } from 'antd';
 import { Button, Card, Checkbox, Popover, Space, Table, Typography } from 'antd';
 import dayjs from 'dayjs';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { LuColumns, LuPieChart } from 'react-icons/lu';
-import { DataType, TABLE_COLUMNS } from './constant';
+import { DataType, TABLE_COLUMNS } from '../salesPage/constant';
 import Styles from "./dashboardPage.module.scss";
 import Filters from './filters';
 import SalesDetailsModal from './salesDetailsModal';
@@ -33,13 +34,20 @@ export const INITIAL_FILTERS = {
 }
 function DashboardPage() {
 
-    const [isModalOpen, setIsModalOpen] = useState(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [chartView, setChartView] = useState(false);
     const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
     const userData = useAppSelector(getAuthUserState);
     const [isLodaing, setIsLodaing] = useState(false)
-
     const [filters, setFilters] = useState(INITIAL_FILTERS)
+    const router = useRouter();
+
+    useEffect(() => {
+        if (userData.roleName && !(userData.roleName == CEO_ROLE || userData.roleName == ADMIN_ROLE)) {
+            router.push("/sales")
+        }
+    }, [userData])
+
 
     const fetchRequests = () => {
         setIsLodaing(true)
@@ -64,20 +72,26 @@ function DashboardPage() {
         fetchRequests()
     }, [filters])
 
-    const handleChange: OnChange = (pagination, filters, sorter) => {
-        console.log('Various parameters', pagination, filters, sorter);
+    const handleModalResponse = () => {
+        fetchRequests();
+        setIsModalOpen(false)
+    }
+
+    const handleChange: OnChange = (pagination: any) => {
+        console.log('Various parameters', pagination);
+        setFilters({ ...filters, pageNumber: pagination.current })
     };
 
-    const defaultCheckedList = TABLE_COLUMNS.map((item) => item.key as string);
+    const defaultCheckedList = TABLE_COLUMNS().map((item) => item.key as string);
 
     const [checkedList, setCheckedList] = useState(defaultCheckedList);
 
-    const options = TABLE_COLUMNS.map(({ key, title }) => ({
+    const options = TABLE_COLUMNS().map(({ key, title }) => ({
         label: title,
         value: key
     }));
 
-    const newColumns = TABLE_COLUMNS.map((item) => ({
+    const newColumns = TABLE_COLUMNS().map((item) => ({
         ...item,
         hidden: !checkedList.includes(item.key as string),
     }));
@@ -135,14 +149,16 @@ function DashboardPage() {
                             };
                         }}
                         bordered
-                        rowKey={(record) => record.id}
+                        rowKey={(record) => record.key}
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={newColumns} dataSource={salesRequestsList} onChange={handleChange} />
+                        columns={newColumns}
+                        dataSource={salesRequestsList}
+                        onChange={handleChange} />
                         : <SalesPersonSale />}
                 </Card>
             </div>
-            {Boolean(isModalOpen) && <SalesDetailsModal isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}
+            {Boolean(isModalOpen) && <SalesDetailsModal handleModalResponse={handleModalResponse} isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}
             {isLodaing && <Loading />}
         </>
     );

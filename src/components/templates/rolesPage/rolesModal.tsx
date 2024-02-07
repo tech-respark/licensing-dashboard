@@ -1,4 +1,4 @@
-import { permissionsList } from "@/constants/common";
+import { ADMIN_ROLE, CEO_ROLE, HOS_ROLE, SALES_PERSON_ROLE, SUPPORT_ROLE, permissionsList } from "@/constants/common";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { createRole, updateRole } from "@/lib/internalApi/roles";
@@ -123,7 +123,7 @@ function RolesModal({ modalData, handleModalResponse }: any) {
         }
         const api = modalData?.role?.id ? updateRole : createRole;
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("User created successfuly."))
+            dispatch(showSuccessToast("User created successfully."))
             details.rolePermissions.id = res?.data.rolePermissions.id;
             handleModalResponse({ ...details, id: res?.data?.id })
             form.resetFields();
@@ -169,7 +169,15 @@ function RolesModal({ modalData, handleModalResponse }: any) {
                                             name={item.name}
                                             rules={[{ required: true, message: `Please enter ${item.label}` }]}
                                         >
-                                            <Input />
+                                            <Input
+                                                disabled={(item.label == "Role Name" && Boolean(modalData?.role?.id) &&
+                                                    (modalData?.role?.roleName == CEO_ROLE ||
+                                                        modalData?.role?.roleName == HOS_ROLE ||
+                                                        modalData?.role?.roleName == ADMIN_ROLE ||
+                                                        modalData?.role?.roleName == SALES_PERSON_ROLE ||
+                                                        modalData?.role?.roleName == SUPPORT_ROLE)
+                                                )}
+                                            />
                                         </Form.Item>}
                                 </React.Fragment>
                             })}

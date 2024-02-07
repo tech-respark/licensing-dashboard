@@ -1,7 +1,7 @@
 /* eslint-disable jsx-a11y/alt-text */
 /* eslint-disable @next/next/no-img-element */
 "use client"
-import { LOGO_IMAGE } from '@/constants/common';
+import { ADMIN_ROLE, CEO_ROLE, LOGO_IMAGE } from '@/constants/common';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getUserByCredentials } from '@/lib/internalApi/user';
@@ -67,8 +67,12 @@ function LoginPage() {
         getUserByCredentials(values)
             .then((response: any) => {
                 dispatch(setAuthUser(response.data))
-                dispatch(showSuccessToast("Perfect! You're signed in successfuly."))
-                router.push("/")
+                dispatch(showSuccessToast("Perfect! You're signed in successfully."))
+                if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
+                    router.push("/")
+                } else {
+                    router.push("/sales")
+                }
                 dispatch(toggleLoader(false))
             })
             .catch((err) => {

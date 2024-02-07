@@ -1,4 +1,4 @@
-import { CEO_ROLE, DATE_FORMAT, HOS_ROLE, REQUEST_STATUSES, SALES_PERSON_ROLE, SUPPORT_ROLE, getDurationOptions } from "@/constants/common";
+import { ADMIN_ROLE, DATE_FORMAT, REQUEST_STATUSES, SALES_PERSON_ROLE, getDurationOptions } from "@/constants/common";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { getClientById } from "@/lib/internalApi/clients";
@@ -6,10 +6,11 @@ import { createRequest, updateRequest } from "@/lib/internalApi/requests";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
 import { removeObjRef } from "@/utils/common";
-import { Button, Card, Checkbox, DatePicker, Descriptions, Divider, Form, Input, Modal, Popconfirm, Select, Space, Typography, theme } from "antd";
+import { Button, Card, Checkbox, DatePicker, Descriptions, Divider, Form, Input, Modal, Select, Space, Typography, theme } from "antd";
 import dayjs from "dayjs";
 import React, { useEffect, useState } from "react";
 import ClientModal from "../clientsPage/clientModal";
+import RequestActions from "./requestActions";
 const { Text } = Typography;
 const { Meta } = Card;
 
@@ -59,14 +60,16 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
     const [error, setError] = useState({ id: "", text: "" })
     const defaultDuration: any = "yearlyPrice";
     const [rejectionRemarkPoppup, setRejectionRemarkPoppup] = useState({ active: false, remark: "" })
+    const [requestDetails, setRequestDetails] = useState(modalData?.request)
 
     useEffect(() => {
         if (Boolean(modalData?.request?.id) && Boolean(modulesList?.length)) {
+            setRequestDetails(modalData?.request);
             //update discount %  
             setDiscountPercentage(modalData.request.discountPercentage)
 
             const updatedStoresList: any[] = []
-            modalData?.request.storeSalesList.map((store: any) => {
+            modalData?.request?.storeSalesList?.map((store: any) => {
                 //update modules list
                 const storeDetails: any = { ...store }
 
@@ -128,9 +131,9 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
 
     useEffect(() => {
         if (form.getFieldValue("client")) {
-            if (!Boolean(modalData?.request?.id)) {
+            if (!Boolean(requestDetails)) {
                 getClientById(form.getFieldValue("client")).then((res: any) => {
-                    const stores = res.data.storeInfoList.filter((s: any) => s.active);
+                    const stores = res.data?.storeInfoList?.filter((s: any) => s.active);
                     stores.map((store: any) => {
                         store.startDate = dayjs(dayjs()).format(DATE_FORMAT);
                         store.endDate = getEndDate(store.startDate, defaultDuration)
@@ -172,14 +175,14 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
     }
 
     const getStatusList = (action: string) => {
-        const statusList = Boolean(modalData?.request?.id) ? removeObjRef(modalData?.request?.statusesList) : [];
-        statusList.push({
+        const statusList = Boolean(requestDetails?.id) ? removeObjRef(requestDetails?.statusesList) : [];
+        if (action == "UPDATE") return statusList;
+        return {
             "status": action,
             "createdBy": userData.name,
             "createdByUserId": userData.id,
             "remark": rejectionRemarkPoppup.remark
-        })
-        return statusList;
+        }
     }
 
     const onCreateUpdate = (values: any, action: string) => {
@@ -190,7 +193,8 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         }
         if (values.salesPerson == userData?.name) values.salesPerson = usersList.find((s: any) => s.name == values.salesPerson).id;
 
-        const requestDetails = {
+        const requestData = {
+            ...requestDetails,
             "productId": userData?.userProductsList[0].productId,
             "tenantId": values.client,
             "salesPersonName": usersList.find((s: any) => s.id == values.salesPerson).name,
@@ -201,17 +205,17 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
             "type": "NEW",
             "remark": form.getFieldValue("remark"),
             "storeSalesList": getstoreSalesList(),
-            "statusesList": getStatusList(action),
+            "updatedStatus": getStatusList(action),
         }
-        console.log("requestDetails", requestDetails)
-        // onSubmit(requestDetails);
+        console.log("requestData", requestData)
+        onSubmit(requestData);
     }
 
     const onSubmit = (values: any) => {
 
         const details = { ...values, productId: userData?.userProductsList[0].productId }
-        if (modalData?.request?.id) {
-            details.id = modalData?.request?.id;
+        if (requestDetails?.id) {
+            details.id = requestDetails?.id;
             details.modifiedBy = userData.name;
             details.modifiedByUserId = userData.id;
         } else {
@@ -219,11 +223,11 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
             details.createdByUserId = userData.id;
         }
 
-        const api = modalData?.request?.id ? updateRequest : createRequest;
+        const api = requestDetails?.id ? updateRequest : createRequest;
 
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("Request created successfuly."))
-            handleModalResponse(res.data)
+            dispatch(showSuccessToast("Request created successfully."))
+            handleModalResponse(res.data);
             form.resetFields();
         })
             .catch((error: any) => {
@@ -267,126 +271,18 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         });
     }
 
-    const getActionButtons = () => {
-        let prmaryButtonText = "";//change on the basis of state and user role
-        let secondaryButtonText = "";//change on the basis of state and user role
-        let action = "";
-        let secondaryAction = "";
-        let disabled = true;
-        const currentStatus = Boolean(modalData?.request?.id) ? modalData?.request?.statusesList[modalData?.request?.statusesList.length - 1] : null;
-        if (Boolean(currentStatus)) {
-            switch (currentStatus.status) {
+    const updateNewStatus = (newStatus: any) => {
+        const statusList = removeObjRef(requestDetails?.statusesList);
+        statusList.push(newStatus);
+        setRequestDetails({ ...requestDetails, statusesList: statusList })
+    }
 
-                case REQUEST_STATUSES.INITIATED:
-                    if (userData.roleName == HOS_ROLE) {
-                        prmaryButtonText = "Approve";
-                        action = REQUEST_STATUSES.APPROVED_BY_HOS;
-                        secondaryAction = REQUEST_STATUSES.REJECTED_BY_HOS;
-                        secondaryButtonText = "Reject";
-                        disabled = false;
-                    } else {
-                        //other than hos roles
-                        prmaryButtonText = "Request send to HOS for approval"
-                        disabled = true;
-                    }
-                    break;
-
-                case REQUEST_STATUSES.APPROVED_BY_HOS:
-                    if (userData.roleName == CEO_ROLE) {
-                        prmaryButtonText = "Approve";
-                        action = REQUEST_STATUSES.APPROVED_BY_CEO;
-                        secondaryAction = REQUEST_STATUSES.REJECTED_BY_CEO;
-                        secondaryButtonText = "Reject";
-                        disabled = false;
-                    } else {
-                        //other than hos roles
-                        prmaryButtonText = "Request send to CEO for approval"
-                        disabled = true;
-                    }
-                    break;
-
-                case REQUEST_STATUSES.APPROVED_BY_CEO:
-                    if (userData.roleName == SUPPORT_ROLE) {
-                        prmaryButtonText = "Mark Onboarded";
-                        action = REQUEST_STATUSES.ONBOARDED;
-                        disabled = false;
-                    } else {
-                        //other than hos roles
-                        prmaryButtonText = "Request send to support for onboarding process"
-                        disabled = true;
-                    }
-                    break;
-
-                case REQUEST_STATUSES.ONBOARDED:
-                    prmaryButtonText = "Client Onboarded Successfully and Currenlty Live";
-                    disabled = true;
-                    break;
-
-                case REQUEST_STATUSES.REJECTED_BY_HOS:
-                    prmaryButtonText = `Request rejected by HOS for reason : ${currentStatus.remark}`
-                    disabled = true;
-                    break;
-
-                case REQUEST_STATUSES.REJECTED_BY_CEO:
-                    prmaryButtonText = `Request rejected by CEO for reason : ${currentStatus.remark}`
-                    disabled = true;
-                    break;
-
-                default:
-                    break;
-            }
-        } else {
-            if (userData.roleName == SALES_PERSON_ROLE) {
-                prmaryButtonText = "Initiate"
-                disabled = false;
-            }
-        }
-
-        return <>
-
-            {secondaryButtonText ? <Popconfirm
-                trigger={"click"}
-                open={rejectionRemarkPoppup.active}
-                title={`${secondaryButtonText} the request`}
-                description={<>
-                    <Space direction="vertical">
-                        {/* <Text>{`Are you sure to ${secondaryButtonText} this request?`}</Text> */}
-                        <Space direction="vertical">
-                            <Text>Please enter reson for rejecting this request:</Text>
-                            <Input
-                                status={error.id == "rejectionRemark" ? "error" : ""}
-                                value={rejectionRemarkPoppup.remark}
-                                onChange={(e) => {
-                                    setError({ id: "", text: "" });
-                                    setRejectionRemarkPoppup({ ...rejectionRemarkPoppup, remark: e.target.value })
-                                }}
-                                placeholder="Enter reson for rection" />
-                        </Space>
-                    </Space>
-                </>}
-                onCancel={() => setRejectionRemarkPoppup({ active: false, remark: "" })}
-                onConfirm={() => onFormSubmit(secondaryAction)}
-                okText="Reject"
-                cancelText="Cancel"
-            >
-                <Button type="default" danger onClick={() => setRejectionRemarkPoppup({ active: true, remark: "" })}>{`${secondaryButtonText}`}</Button>
-            </Popconfirm> : null}
-
-            {prmaryButtonText ? <Popconfirm
-                title={`${prmaryButtonText} the request`}
-                description={`Are you sure to ${prmaryButtonText} this request?`}
-                onConfirm={() => onFormSubmit(action)}
-                okText="Yes Sure"
-                cancelText="Cancel"
-            >
-                <Button type={disabled ? "text" : "primary"} disabled={disabled}>{`${prmaryButtonText}`}</Button>
-            </Popconfirm> : null}
-
-        </>
+    const getCurrentStatus = () => {
+        return Boolean(requestDetails?.id) ? requestDetails?.statusesList[requestDetails?.statusesList?.length - 1].status : ""
     }
 
     return (
-        <Modal title={modalData?.request ? "Update Module" : "Add New Module"} open={modalData?.active}
+        <Modal title={requestDetails ? "Update Request" : "Add New Request"} open={modalData?.active}
             styles={{
                 body: {
                     width: "100%",
@@ -400,7 +296,11 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
             footer={(_, { OkBtn, CancelBtn }) => (
                 <>
                     <CancelBtn />
-                    {getActionButtons()}
+                    {Boolean(userData?.roleName == SALES_PERSON_ROLE || userData?.roleName == ADMIN_ROLE) && <>
+                        {!getCurrentStatus() && <Button type="primary" onClick={() => onFormSubmit(REQUEST_STATUSES.INITIATED)}>Initiate</Button>}
+                        {getCurrentStatus() == REQUEST_STATUSES.INITIATED && <Button type="primary" onClick={() => onFormSubmit("UPDATE")}>Update</Button>}
+                    </>}
+                    {<RequestActions handleModalResponse={handleModalResponse} requestDetails={requestDetails} updateNewStatus={updateNewStatus} />}
                 </>)}
             onCancel={handleCancel}>
             <Space direction="vertical">
@@ -412,11 +312,11 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                         form={form}
                         layout="vertical"
                         initialValues={{
-                            client: modalData?.request?.tenantId,
-                            salesPerson: modalData?.request?.salesPersonId,
-                            discountPercentage: modalData?.request?.discountPercentage,
-                            remark: modalData?.request?.remark,
-                            duration: modalData?.request?.duration || defaultDuration,
+                            client: requestDetails?.tenantId,
+                            salesPerson: requestDetails?.salesPersonId,
+                            discountPercentage: requestDetails?.discountPercentage,
+                            remark: requestDetails?.remark,
+                            duration: requestDetails?.duration || defaultDuration,
                         }}
                     >
                         <Space direction="vertical">
