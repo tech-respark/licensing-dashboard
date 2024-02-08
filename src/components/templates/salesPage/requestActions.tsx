@@ -1,16 +1,18 @@
 // import { REQUEST_STATUSES } from '@/constants/common'
+import { DATE_FORMAT, REQUEST_STATUS_COLORS_LIST } from '@/constants/common';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { updateRequestStatus } from '@/lib/internalApi/requests';
 import { getAuthUserState } from '@/redux/slices/auth';
 import { showErrorToast, showSuccessToast } from '@/redux/slices/toast';
-import { Button, Input, Popconfirm, Space, Typography } from 'antd';
+import { Button, Input, Popconfirm, Space, Tag, Typography } from 'antd';
+import dayjs from 'dayjs';
 import { Fragment, useEffect, useState } from 'react';
 import { getActionsAfterApprovedByAdmin } from './requestActions/APPROVED_BY_ADMIN';
 import { getActionsAfterApprovedByCeo } from './requestActions/APPROVED_BY_CEO';
 import { getActionsAfterApprovedByHos } from './requestActions/APPROVED_BY_HOS';
 import { getActionsAfterInitiated } from './requestActions/INITIATED';
-import { getActionsAfterNegotiated } from './requestActions/NIGOTIATED';
+import { getActionsAfterNegotiated } from './requestActions/NEGOTIATED';
 import { getActionsAfterOnboarded } from './requestActions/ONBOARDED';
 import { getActionsAfterReject } from './requestActions/REJECTED';
 const { Text } = Typography;
@@ -20,15 +22,15 @@ export const REQUEST_STATUSES = {
 
     "APPROVED_BY_HOS": "APPROVED_BY_HOS",
     "REJECTED_BY_HOS": "REJECTED_BY_HOS",
-    "NIGOTIATE_BY_HOS": "NIGOTIATE_BY_HOS",
+    "NEGOTIATE_BY_HOS": "NEGOTIATE_BY_HOS",
 
     "APPROVED_BY_CEO": "APPROVED_BY_CEO",
-    "NIGOTIATE_BY_CEO": "NIGOTIATE_BY_CEO",
+    "NEGOTIATE_BY_CEO": "NEGOTIATE_BY_CEO",
     "REJECTED_BY_CEO": "REJECTED_BY_CEO",
 
     "APPROVED_BY_ADMIN": "APPROVED_BY_ADMIN",
     "REJECTED_BY_ADMIN": "REJECTED_BY_ADMIN",
-    "NIGOTIATE_BY_ADMIN": "NIGOTIATE_BY_ADMIN",
+    "NEGOTIATE_BY_ADMIN": "NEGOTIATE_BY_ADMIN",
 
     "ONBOARDED": "ONBOARDED"
 }
@@ -47,7 +49,7 @@ export type ACTION_TYPE = {
     action: string
 }
 
-function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }: any) {
+function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestDetails, updateNewStatus, setIsLoading }: any) {
 
     const [remarkPopup, setRemarkPopup] = useState({ active: false, remark: "" })
     const [negotiationPopup, setNegotiationPopup] = useState({ active: false, remark: "", price: 0 })
@@ -55,6 +57,10 @@ function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }
     const userData = useAppSelector(getAuthUserState);
 
     const currentStatus = Boolean(requestDetails?.id) ? requestDetails?.statusesList[requestDetails?.statusesList.length - 1] : null;
+    const inititatedStatus = requestDetails?.statusesList[0];
+    const negotiationStatus = requestDetails?.statusesList.find((s: any) => s.status.toLowerCase().includes("negotiate") || s.status.toLowerCase().includes("nigotiate"));
+    const rejectionStatus = requestDetails?.statusesList.find((s: any) => s.status.toLowerCase().includes("reject"));
+
     const currentRole = userData?.roleName;
     const dispatch = useAppDispatch()
     const [actionsList, setActionsList] = useState([...inititalActions])
@@ -76,7 +82,7 @@ function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }
                 case REQUEST_STATUSES.REJECTED_BY_HOS:
                     actions = getActionsAfterReject(currentRole)
                     break;
-                case REQUEST_STATUSES.NIGOTIATE_BY_HOS:
+                case REQUEST_STATUSES.NEGOTIATE_BY_HOS:
                     actions = getActionsAfterNegotiated(currentRole)
                     break;
 
@@ -87,7 +93,7 @@ function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }
                 case REQUEST_STATUSES.REJECTED_BY_CEO:
                     actions = getActionsAfterReject(currentRole)
                     break;
-                case REQUEST_STATUSES.NIGOTIATE_BY_CEO:
+                case REQUEST_STATUSES.NEGOTIATE_BY_CEO:
                     actions = getActionsAfterNegotiated(currentRole)
                     break;
 
@@ -98,7 +104,7 @@ function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }
                 case REQUEST_STATUSES.REJECTED_BY_ADMIN:
                     actions = getActionsAfterReject(currentRole)
                     break;
-                case REQUEST_STATUSES.NIGOTIATE_BY_ADMIN:
+                case REQUEST_STATUSES.NEGOTIATE_BY_ADMIN:
                     actions = getActionsAfterNegotiated(currentRole)
                     break;
 
@@ -157,6 +163,8 @@ function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }
     }
 
     const updateRequest = (newStatus: any) => {
+
+        setIsLoading(true)
         updateRequestStatus({
             id: requestDetails.id,
             updatedStatus: newStatus
@@ -166,112 +174,165 @@ function RequestActions({ handleModalResponse, requestDetails, updateNewStatus }
             setRemarkPopup({ active: false, remark: "" })
             setNegotiationPopup({ active: false, remark: "", price: 0 })
             handleModalResponse()
+            setIsLoading(false)
         })
             .catch((error: any) => {
                 console.log(error)
+                setIsLoading(false)
                 dispatch(showErrorToast(`Request updation failed error: ${error}`))
             })
     }
 
     const onSubmitAction = (action: any) => {
         console.log("onSubmitAction", action)
+        let price = 0;
+        let discountPercentage = 0;
+        if (Boolean(negotiationStatus) && (action == REQUEST_STATUSES.APPROVED_BY_ADMIN || action == REQUEST_STATUSES.APPROVED_BY_CEO)) {
+            price = negotiationStatus.price;
+            discountPercentage = ((Number(requestDetails.sellingPrice) - Number(negotiationStatus.price)) / Number(requestDetails.sellingPrice)) * 100;
+        }
         const newStatus = {
             "status": action,
             "createdBy": userData.name,
             "createdByUserId": userData.id,
-            "price": 0,
-            "discountPercentage": 0,
+            "price": price,
+            "discountPercentage": discountPercentage,
             "remark": ""
         }
         updateRequest(newStatus)
     }
 
+
+    const getRequestDetailsTagline = (requestDetails: any) => {
+
+        return (
+            <>
+                {Boolean(requestDetails) ?
+                    <Tag
+                        style={{
+                            maxWidth: "100%",
+                            lineHeight: 2,
+                            display: "flex",
+                            textAlign: "left",
+                            justifyContent: "flex-start",
+                            alignItems: "flex-start",
+                            flexWrap: "wrap",
+                            // fontSize: 14
+                        }}
+                        color={REQUEST_STATUS_COLORS_LIST[currentStatus.status]}>
+                        <>This request is initiated by&nbsp;
+                            {inititatedStatus.createdBy} ({dayjs(inititatedStatus.createdOn).format(DATE_FORMAT)})
+                            and it is in {currentStatus.status} ({dayjs(inititatedStatus.createdOn).format(DATE_FORMAT)}) state.</>
+                        <br />
+                        {Boolean(negotiationStatus) && <>Negotiation price is {negotiationStatus?.price}</>}
+                        {Boolean(rejectionStatus) && <>Request rejected due to {rejectionStatus?.remark}</>}
+                    </Tag>
+                    : <>
+                    </>}
+            </>
+        )
+    }
+
+
     return (
         <>
-            {actionsList.map((actionDetails: ACTION_TYPE, i: number) => {
-                return <Fragment key={i}>
+            <Space direction='vertical'>
+                <Space>
+                    {getRequestDetailsTagline(requestDetails)}
+                </Space>
+                <Space>
+                    {CancelBtn}
+                    {extraActions}
+                    {actionsList.map((actionDetails: ACTION_TYPE, i: number) => {
+                        return <Fragment key={i}>
 
-                    {Boolean(actionDetails.name == "Reject" && actionDetails.active) && <>
-                        <Popconfirm
-                            trigger={"click"}
-                            open={remarkPopup.active}
-                            title={`Reject the request`}
-                            description={<>
-                                <Space direction="vertical">
-                                    <Space direction="vertical">
-                                        <Text>Please Enter reason for rejection:</Text>
-                                        <Input
-                                            status={error.id == "rejectionRemark" ? "error" : ""}
-                                            value={remarkPopup.remark}
-                                            onChange={(e) => {
-                                                setError({ id: "", text: "" });
-                                                setRemarkPopup({ ...remarkPopup, remark: e.target.value })
-                                            }}
-                                            placeholder="Enter reason for rejection" />
-                                    </Space>
-                                </Space>
+                            {Boolean(actionDetails.name == "Reject" && actionDetails.active) && <>
+                                <Popconfirm
+                                    icon={<></>}
+                                    trigger={"click"}
+                                    open={remarkPopup.active}
+                                    title={`Reject the request`}
+                                    description={<>
+                                        <Space direction="vertical">
+                                            <Space direction="vertical">
+                                                <Text>Please Enter reason for rejection:</Text>
+                                                <Input
+                                                    status={error.id == "rejectionRemark" ? "error" : ""}
+                                                    value={remarkPopup.remark}
+                                                    onChange={(e) => {
+                                                        setError({ id: "", text: "" });
+                                                        setRemarkPopup({ ...remarkPopup, remark: e.target.value })
+                                                    }}
+                                                    placeholder="Enter reason for rejection" />
+                                            </Space>
+                                        </Space>
+                                    </>}
+                                    onCancel={() => setRemarkPopup({ active: false, remark: "" })}
+                                    onConfirm={() => onRejectRequest(actionDetails.action)}
+                                    okText="Reject"
+                                    cancelText="Cancel"
+                                >
+                                    <Button type="default" danger onClick={() => setRemarkPopup({ active: true, remark: "" })}>Reject</Button>
+                                </Popconfirm>
                             </>}
-                            onCancel={() => setRemarkPopup({ active: false, remark: "" })}
-                            onConfirm={() => onRejectRequest(actionDetails.action)}
-                            okText="Reject"
-                            cancelText="Cancel"
-                        >
-                            <Button type="default" danger onClick={() => setRemarkPopup({ active: true, remark: "" })}>Reject</Button>
-                        </Popconfirm>
-                    </>}
 
-                    {Boolean(actionDetails.name == "Negotiate" && actionDetails.active) && <>
-                        <Popconfirm
-                            trigger={"click"}
-                            open={negotiationPopup.active}
-                            title={`Negotiate the request`}
-                            description={<>
-                                <Space direction="vertical">
-                                    <Space direction="vertical">
-                                        <Text>Please enter expected negotiation price:</Text>
-                                        <Input
-                                            status={error.id == "negotiationPrice" ? "error" : ""}
-                                            value={negotiationPopup.price}
-                                            onChange={(e: any) => {
-                                                setError({ id: "", text: "" });
-                                                setNegotiationPopup({ ...negotiationPopup, price: e.target.value })
-                                            }}
-                                            placeholder="Enter price" />
-                                    </Space>
-                                    <Space direction="vertical">
-                                        <Text>Please enter remark if any:</Text>
-                                        <Input
-                                            value={negotiationPopup.remark}
-                                            onChange={(e: any) => {
-                                                setError({ id: "", text: "" });
-                                                setNegotiationPopup({ ...negotiationPopup, remark: e.target.value })
-                                            }}
-                                            placeholder="Enter remark" />
-                                    </Space>
-                                </Space>
+                            {Boolean(actionDetails.name == "Negotiate" && actionDetails.active) && <>
+                                <Popconfirm
+                                    trigger={"click"}
+                                    open={negotiationPopup.active}
+                                    title={`Negotiate the request`}
+                                    description={<>
+                                        <Space direction="vertical">
+                                            <Space direction="vertical">
+                                                <Text>Please enter expected negotiation price:</Text>
+                                                <Input
+                                                    status={error.id == "negotiationPrice" ? "error" : ""}
+                                                    value={negotiationPopup.price}
+                                                    onChange={(e: any) => {
+                                                        setError({ id: "", text: "" });
+                                                        setNegotiationPopup({ ...negotiationPopup, price: e.target.value })
+                                                    }}
+                                                    placeholder="Enter price" />
+                                            </Space>
+                                            <Space direction="vertical" style={{ width: "100%" }}>
+                                                <Text>Please enter remark if any:</Text>
+                                                <Input
+                                                    style={{ width: "100%" }}
+                                                    value={negotiationPopup.remark}
+                                                    onChange={(e: any) => {
+                                                        setError({ id: "", text: "" });
+                                                        setNegotiationPopup({ ...negotiationPopup, remark: e.target.value })
+                                                    }}
+                                                    placeholder="Enter remark" />
+                                            </Space>
+                                        </Space>
+                                    </>}
+                                    onCancel={() => setNegotiationPopup({ active: false, remark: "", price: 0 })}
+                                    onConfirm={() => onNegotiateRequest(actionDetails.action)}
+                                    okText="Negotiate"
+                                    cancelText="Cancel"
+                                    icon={<></>}
+                                >
+                                    <Button type="default" onClick={() => setNegotiationPopup({ active: true, remark: "", price: 0 })}>Negotiate</Button>
+                                </Popconfirm>
                             </>}
-                            onCancel={() => setNegotiationPopup({ active: false, remark: "", price: 0 })}
-                            onConfirm={() => onNegotiateRequest(actionDetails.action)}
-                            okText="Negotiate"
-                            cancelText="Cancel"
-                        >
-                            <Button type="default" onClick={() => setNegotiationPopup({ active: true, remark: "", price: 0 })}>Negotiate</Button>
-                        </Popconfirm>
-                    </>}
 
-                    {Boolean((actionDetails.name == "Approve" && actionDetails.active) || (actionDetails.name == "Initiate" && actionDetails.active) || (actionDetails.name == "Onboarded" && actionDetails.active)) && <>
-                        <Popconfirm
-                            title={`${actionDetails.name} the request`}
-                            description={`Are you sure to ${actionDetails.name} this request?`}
-                            onConfirm={() => onSubmitAction(actionDetails.action)}
-                            okText="Yes Sure"
-                            cancelText="Cancel"
-                        >
-                            <Button type="primary">{`${actionDetails.name}`}</Button>
-                        </Popconfirm>
-                    </>}
-                </Fragment>
-            })}
+                            {Boolean((actionDetails.name == "Approve" && actionDetails.active) || (actionDetails.name == "Initiate" && actionDetails.active) || (actionDetails.name == "Onboarded" && actionDetails.active)) && <>
+                                <Popconfirm
+                                    icon={<></>}
+                                    title={`${actionDetails.name} the request`}
+                                    description={`Are you sure you want to ${actionDetails.name} this request?`}
+                                    onConfirm={() => onSubmitAction(actionDetails.action)}
+                                    okText="Yes Sure"
+                                    cancelText="Cancel"
+                                >
+                                    <Button type="primary">{`${actionDetails.name}`}</Button>
+                                </Popconfirm>
+                            </>}
+                        </Fragment>
+                    })}
+                </Space>
+            </Space>
         </>
     )
 }

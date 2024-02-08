@@ -195,7 +195,7 @@ function ClientModal({ modalData, handleModalResponse }: any) {
                                                             <Input placeholder="email" />
                                                         </Form.Item>
                                                         <Form.Item name={[field.name, 'phoneNumber']}>
-                                                            <Input placeholder="Phoone Number" />
+                                                            <Input placeholder="Phone Number" />
                                                         </Form.Item>
                                                     </Space>
 

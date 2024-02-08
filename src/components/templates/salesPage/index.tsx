@@ -22,7 +22,7 @@ export const INITIAL_FILTERS = {
     "userId": null,
     "currentStatus": null,
     "sortBy": "DESC",
-    "orderBy": "sellingPrice",
+    "orderBy": "",
     "fromDate": new Date(),
     "toDate": new Date(),
     "pageNumber": 1,
@@ -79,6 +79,25 @@ function SalesPage() {
     const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
     const [filters, setFilters] = useState(INITIAL_FILTERS)
 
+    const fetchRequests = () => {
+        setIsLoading(true)
+        getAllRequests({
+            ...filters,
+            userId: Boolean(userData?.rolePermissions?.requestsDashboard) ? filters.userId : userData?.id,
+            fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
+            toDate: dayjs(filters.toDate).format(DATE_FORMAT)
+        }).then((res: any) => {
+            setIsLoading(false)
+            if (res.data) {
+                setSalesRequestsList(res.data)
+            }
+        })
+    }
+
+    useEffect(() => {
+        fetchRequests()
+    }, [filters])
+
     const fetchBaseData = () => {
         return new Promise((res: any, rej: any) => {
             if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0) {
@@ -88,7 +107,7 @@ function SalesPage() {
                 let usersList: any = [];
                 let modulesList: any = [];
 
-                getClientsByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+                getClientsByProduct(INITIAL_FILTERS).then((res: any) => {
                     if (res.data) clientsList = res.data;
                 }).catch(function (error: any) {
                     console.log(`/getClientsByProduct `, error);
@@ -117,24 +136,6 @@ function SalesPage() {
         })
     }
 
-    const fetchRequests = () => {
-        setIsLoading(true)
-        getAllRequests({
-            ...filters,
-            fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
-            toDate: dayjs(filters.toDate).format(DATE_FORMAT)
-        }).then((res: any) => {
-            setIsLoading(false)
-            if (res.data) {
-                setSalesRequestsList(res.data)
-            }
-        })
-    }
-
-    useEffect(() => {
-        fetchRequests()
-    }, [filters])
-
     const data: DataType[] = [...salesRequestsList];
 
     const handleModalResponse = (data: any) => {
@@ -160,17 +161,19 @@ function SalesPage() {
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title="All Sales List" extra={
-                    <Space>
-                        <Button type='primary' onClick={() => {
-                            setIsLoading(true);
-                            fetchBaseData().then(() => {
-                                setIsLoading(false);
-                                setModalData({ active: true, request: null })
-                            })
-                        }}>Add New Request</Button>
-                        <Filters setInitialFilters={setFilters} initialFilters={filters} />
-                    </Space>}>
+                <Card title="All Sales List"
+                    extra={
+                        <Space>
+                            <Button type='primary' onClick={() => {
+                                setIsLoading(true);
+                                fetchBaseData().then(() => {
+                                    setIsLoading(false);
+                                    setModalData({ active: true, request: null })
+                                })
+                            }}>Add New Request</Button>
+                            <Filters setInitialFilters={setFilters} initialFilters={filters} />
+                        </Space>}
+                >
                     <Table
                         onRow={(record: any) => {
                             return {
@@ -190,12 +193,14 @@ function SalesPage() {
                         bordered
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={TABLE_COLUMNS()} dataSource={data}
+                        columns={TABLE_COLUMNS().filter((c: any) => c.key !== "expiryDate")}
+                        dataSource={data}
                         onChange={handleChange}
                     />
                 </Card>
             </Space>
             {isLoading && <Loading />}
+
             {modalData.active && <CreateRequestModal
                 clientsList={clientsList}
                 modulesList={modulesList}

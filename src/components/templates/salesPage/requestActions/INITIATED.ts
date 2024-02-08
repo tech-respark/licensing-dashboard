@@ -17,7 +17,7 @@ export const getActionsAfterInitiated = (currentRole: string) => {
                         break;
                     case "Negotiate":
                         action.active = true;
-                        action.action = REQUEST_STATUSES.NIGOTIATE_BY_ADMIN;
+                        action.action = REQUEST_STATUSES.NEGOTIATE_BY_ADMIN;
                         break;
                     case "Reject":
                         action.active = true;
@@ -58,7 +58,7 @@ export const getActionsAfterInitiated = (currentRole: string) => {
                         break;
                     case "Negotiate":
                         action.active = true;
-                        action.action = REQUEST_STATUSES.NIGOTIATE_BY_HOS
+                        action.action = REQUEST_STATUSES.NEGOTIATE_BY_HOS
                         break;
                     case "Reject":
                         action.active = true;

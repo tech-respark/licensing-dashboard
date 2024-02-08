@@ -1,4 +1,4 @@
-import { ADMIN_ROLE, CEO_ROLE, HOS_ROLE, REQUEST_STATUSES, SALES_PERSON_ROLE } from '@/constants/common';
+import { REQUEST_STATUSES, SALES_PERSON_ROLE } from '@/constants/common';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getUsersByProduct } from '@/lib/internalApi/user';
 import { getAuthUserState } from '@/redux/slices/auth';
@@ -10,13 +10,13 @@ import { INITIAL_FILTERS } from '.';
 import Styles from "./dashboardPage.module.scss";
 const { Text } = Typography;
 
-function Filters({ initialFilters, setInitialFilters }: any) {
+function Filters({ hide = "", initialFilters, setInitialFilters }: any) {
     const [statusOptions, setStatusOptions] = useState<any>([])
     const userData = useAppSelector(getAuthUserState);
     const [salesPersonsList, setSalesPersonsList] = useState([])
     const [openFiltersPopup, setOpenFiltersPopup] = useState(false)
     const [filters, setFilters] = useState(initialFilters);
-
+    console.log(userData)
     useEffect(() => {
         setFilters(initialFilters);
     }, [openFiltersPopup])
@@ -65,7 +65,7 @@ function Filters({ initialFilters, setInitialFilters }: any) {
                 </Space>
             </Space>
 
-            <Space direction='vertical'>
+            {!Boolean(hide.includes("status")) && <Space direction='vertical'>
                 <Text>Status</Text>
                 <Select
                     allowClear
@@ -81,9 +81,9 @@ function Filters({ initialFilters, setInitialFilters }: any) {
                     onChange={(value: any) => setFilters({ ...filters, currentStatus: value })}
                     options={statusOptions}
                 />
-            </Space>
+            </Space>}
 
-            {(userData?.roleName == CEO_ROLE || userData?.roleName == HOS_ROLE || userData?.roleName == ADMIN_ROLE) && <Space direction='vertical'>
+            {Boolean(userData?.rolePermissions?.usersDashboard) && <Space direction='vertical'>
                 <Text>Sales Persons</Text>
                 <Select
                     allowClear

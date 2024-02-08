@@ -1,13 +1,19 @@
 'use client'
 
+import Loading from '@/app/loading';
+import { DATE_FORMAT } from '@/constants/common';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getClientById, getClientsByProduct } from '@/lib/internalApi/clients';
 import { getAuthUserState } from '@/redux/slices/auth';
-import type { TableColumnsType, TableProps } from 'antd';
+import type { TableProps } from 'antd';
 import { Button, Card, Space, Table } from 'antd';
+import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
+import { INITIAL_FILTERS } from '../dashboardPage';
+import Filters from '../dashboardPage/filters';
 import ClientModal from './clientModal';
 import Styles from "./clientsPage.module.scss";
+import { TABLE_COLUMNS } from './constant';
 
 interface DataType {
     key: string;
@@ -21,102 +27,59 @@ interface DataType {
 }
 
 type OnChange = NonNullable<TableProps<DataType>['onChange']>;
-type Filters = Parameters<OnChange>[1];
-
-type GetSingle<T> = T extends (infer U)[] ? U : never;
-type Sorts = GetSingle<Parameters<OnChange>[2]>;
 
 function ClientsPage() {
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [modalData, setModalData] = useState({ active: false, client: null });
     const [clientsList, setClientsList] = useState<any[]>([]);
     const userData = useAppSelector(getAuthUserState);
-    const [filteredInfo, setFilteredInfo] = useState<Filters>({});
-    const [sortedInfo, setSortedInfo] = useState<Sorts>({});
+    const [isLoading, setIsLoading] = useState(false)
 
-    const handleChange: OnChange = (pagination, filters, sorter) => {
-        console.log('Various parameters', pagination, filters, sorter);
-        setFilteredInfo(filters);
-        setSortedInfo(sorter as Sorts);
-    };
+    const [filters, setFilters] = useState(INITIAL_FILTERS)
 
+    const fetchRequests = () => {
+        const filtersList: any = { ...filters };
+        delete filtersList.currentStatus;
+
+        setIsLoading(true)
+        getClientsByProduct({
+            ...filters,
+            userId: Boolean(userData?.rolePermissions?.clientsDashboard) ? filters.userId : userData?.id,
+            fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
+            toDate: dayjs(filters.toDate).format(DATE_FORMAT)
+        }).then((res: any) => {
+            setIsLoading(false)
+            if (res.data) {
+                setClientsList(res.data)
+            } else setClientsList([])
+        })
+    }
 
     useEffect(() => {
-        getClientsByProduct(userData?.userProductsList[0].productId).then((res: any) => {
-            if (res.data) setClientsList(res.data)
-        }).catch(function (error: any) {
-            console.log(`/getClientsByProduct `, error);
-        });
-    }, [])
+        fetchRequests()
+    }, [filters])
 
     const handleModalResponse = (data: any) => {
-        if (data?.id) {
-            const moduleListCopy: any[] = [...clientsList]
-            let index = clientsList.findIndex((u: any) => u.id == data.id);
-            if (index == -1) {
-                moduleListCopy.unshift(data);
-            } else {
-                moduleListCopy[index] = data
-            }
-            setClientsList(moduleListCopy)
-        }
+        fetchRequests()
         setModalData({ active: false, client: null })
     }
 
+    const handleChange: OnChange = (pagination: any) => {
+        console.log('Various parameters', pagination);
+        setFilters({ ...filters, pageNumber: pagination.current })
+    };
 
     const data: DataType[] = [...clientsList];
-
-    const columns: TableColumnsType<DataType> = [
-        {
-            title: 'Business Name',
-            dataIndex: 'businessName',
-            key: 'businessName',
-        },
-        {
-            title: 'Client Name',
-            dataIndex: 'name',
-            key: 'name',
-        },
-        {
-            title: 'Number',
-            dataIndex: 'phoneNumber',
-            key: 'phoneNumber',
-        },
-        {
-            title: 'Stores Count',
-            dataIndex: 'storeCount',
-            key: 'storeCount',
-        },
-        {
-            title: 'Business Location',
-            dataIndex: 'businessAddress',
-            key: 'businessAddress',
-        },
-        {
-            title: 'Sales Person',
-            dataIndex: 'createdBy',
-            key: 'createdBy',
-            filters: [
-                { text: 'Unnati', value: 'Unnati' },
-                { text: 'Mayank', value: 'Mayank' },
-                { text: 'Ashish', value: 'Ashish' },
-                { text: 'Kiara', value: 'Kiara' },
-                { text: 'Karishma', value: 'Karishma' },
-            ],
-            filteredValue: filteredInfo.salesPerson || null,
-            onFilter: (value: any, record: DataType) => record.salesPerson.includes(value),
-            sorter: (a, b) => a.salesPerson.length - b.salesPerson.length,
-            sortOrder: sortedInfo.columnKey === 'salesPerson' ? sortedInfo.order : null,
-            // ellipsis: true,
-        },
-    ];
 
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
-                <Card title="All Clients List" extra={<Space>
-                    <Button type='primary' size='large' onClick={() => setModalData({ active: true, client: null })}>Add New Client</Button>
-                </Space>}>
+                <Card title="All Clients List"
+                    extra={
+                        <Space>
+                            <Button type='primary' onClick={() => setModalData({ active: true, client: null })}>Add New Client</Button>
+                            <Filters hide={"status"} setInitialFilters={setFilters} initialFilters={filters} />
+                        </Space>}
+                >
                     <Table
                         onRow={(record: any, rowIndex: any) => {
                             return {
@@ -132,9 +95,12 @@ function ClientsPage() {
                         bordered
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={columns} dataSource={data} onChange={handleChange} />
+                        columns={TABLE_COLUMNS()}
+                        dataSource={data}
+                        onChange={handleChange} />
                 </Card>
             </Space>
+            {isLoading && <Loading />}
             {modalData.active && <ClientModal modalData={modalData} handleModalResponse={handleModalResponse} />}
         </>
     )

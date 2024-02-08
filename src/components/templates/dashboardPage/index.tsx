@@ -14,11 +14,12 @@ import { LuColumns, LuPieChart } from 'react-icons/lu';
 import { DataType, TABLE_COLUMNS } from '../salesPage/constant';
 import Styles from "./dashboardPage.module.scss";
 import Filters from './filters';
+import PieChartView from './pieChartView';
 import SalesDetailsModal from './salesDetailsModal';
-import SalesPersonSale from './salesPersonSale';
 const { Text, Title } = Typography;
 
 type OnChange = NonNullable<TableProps<DataType>['onChange']>;
+
 
 export const INITIAL_FILTERS = {
     "filters": [],
@@ -26,12 +27,13 @@ export const INITIAL_FILTERS = {
     "userId": null,
     "currentStatus": null,
     "sortBy": "DESC",
-    "orderBy": "sellingPrice",
+    "orderBy": "",
     "fromDate": new Date(),
     "toDate": new Date(),
     "pageNumber": 1,
     "recordsPerPage": 10,
 }
+
 function DashboardPage() {
 
     const [isModalOpen, setIsModalOpen] = useState(false);
@@ -43,7 +45,7 @@ function DashboardPage() {
     const router = useRouter();
 
     useEffect(() => {
-        if (userData.roleName && !(userData.roleName == CEO_ROLE || userData.roleName == ADMIN_ROLE)) {
+        if (userData?.roleName && !(userData?.roleName == CEO_ROLE || userData?.roleName == ADMIN_ROLE)) {
             router.push("/sales")
         }
     }, [userData])
@@ -54,6 +56,7 @@ function DashboardPage() {
         getDashboardRequests(
             {
                 ...filters,
+                orderBy: "sellingPrice",
                 fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
                 toDate: dayjs(filters.toDate).format(DATE_FORMAT)
             }
@@ -143,7 +146,7 @@ function DashboardPage() {
                                     getRequestById(record.saleId).then((res: any) => {
                                         setIsLodaing(false);
                                         console.log("original request", res.data)
-                                        setIsModalOpen({ ...res.data, saleSummary: record })
+                                        setIsModalOpen({ ...res.data })
                                     })
                                 },
                             };
@@ -155,7 +158,13 @@ function DashboardPage() {
                         columns={newColumns}
                         dataSource={salesRequestsList}
                         onChange={handleChange} />
-                        : <SalesPersonSale />}
+                        : <>
+                            <Space direction='vertical'>
+                                <PieChartView type="salesPersonName" valueKey="Total" salesRequestsList={salesRequestsList} />
+                                <PieChartView type="currentStatus" valueKey="Count" salesRequestsList={salesRequestsList} />
+                            </Space>
+                        </>
+                    }
                 </Card>
             </div>
             {Boolean(isModalOpen) && <SalesDetailsModal handleModalResponse={handleModalResponse} isModalOpen={Boolean(isModalOpen)} setIsModalOpen={setIsModalOpen} salesDetails={isModalOpen} />}

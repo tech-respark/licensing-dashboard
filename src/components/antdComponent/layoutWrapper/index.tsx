@@ -1,6 +1,7 @@
 'use client'
 import HeaderComponent from '@/components/organisms/headerComponent';
 import SidebarComponent from '@/components/organisms/sidebarComponent';
+import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import AntdThemeProvider from '@/providers/antdThemeProvider';
 import NoSSRProvider from '@/providers/noSSRProvider';
@@ -19,17 +20,13 @@ export default function AntdLayoutWrapper(props: any) {
     const isDarkMode = useAppSelector(getDarkModeState);
     const router = useRouter();
     const [collapsed, setCollapsed] = useState(false);
-
+    const dispatch = useAppDispatch()
     const { token } = theme.useToken();
-    console.log("inside AntdLayoutWrapper")
-
-    const userData = useAppSelector(getAuthUserState)
-    console.log("userData in dahsboard", userData)
-    // if (!userData) return router.push("login")
+    const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
         if (!userData) {
-            return router.push("login")
+            return router.push("/login")
         }
     }, [userData])
 

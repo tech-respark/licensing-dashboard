@@ -7,7 +7,7 @@ import { showSuccessToast } from "@/redux/slices/toast";
 import { Avatar, Button, Card, Layout, Popover, Space, Typography } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback } from "react";
-import { LuBell, LuCloudSunRain, LuLogOut, LuPen, LuUser } from 'react-icons/lu';
+import { LuCloudSunRain, LuLogOut, LuPen, LuUser } from 'react-icons/lu';
 import Styles from "./headerComponent.module.scss";
 const { Header } = Layout;
 const { Text } = Typography;
@@ -76,15 +76,28 @@ function HeaderComponent() {
             </Space>
             <Space align="end" className={Styles.elements} size={15}>
 
-                <Popover content={renderNotificationContent()} title="Your Notifications" trigger="hover">
+                {/* <Popover content={renderNotificationContent()} title="Your Notifications" trigger="hover">
                     <Button shape='circle' size='large' icon={<LuBell />} />
-                </Popover>
+                </Popover> */}
 
+
+                {userData.roleName &&
+                    <Popover content={renderProfileContent()} title="" trigger="hover">
+                        <Space>
+                            <Space direction="vertical" size={0} style={{
+                                display: "flex",
+                                justifyContent: "flex-start",
+                                alignItems: "flex-start"
+                            }}>
+                                <Text style={{ color: "white" }}>{userData.name}</Text>
+                                <Text style={{ color: "white" }}>{userData.roleName}</Text>
+                            </Space>
+                            <Button shape='circle' size='large' icon={<LuUser />} />
+                        </Space>
+                    </Popover>
+                }
                 <Button onClick={() => dispatch(toggleDarkMode(!isDarkMode))} shape='circle' size='large' icon={<LuCloudSunRain />} />
 
-                <Popover content={renderProfileContent()} title="" trigger="hover">
-                    <Button shape='circle' size='large' icon={<LuUser />} />
-                </Popover>
             </Space>
         </Header>
     )

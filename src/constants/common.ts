@@ -39,11 +39,11 @@ export const PRODUCTS_LIST = [
 ]
 
 export const permissionsList = [
-    { key: "dashboard", value: true, title: "Dashboard" },
+    // { key: "dashboard", value: true, title: "Dashboard" },
     { key: "requestsDashboard", value: false, title: "Requests Dashboard" },
     { key: "clientsDashboard", value: false, title: "Clients Dashboard" },
     { key: "reportsDashboard", value: true, title: "Reports Dashboard" },
-    { key: "usersDashboard", value: true, title: "Users Dashboard" },
+    // { key: "usersDashboard", value: true, title: "Users Dashboard" },
 ]
 
 export const getDurationOptions = () => [
@@ -58,15 +58,41 @@ export const REQUEST_STATUSES = {
 
     "APPROVED_BY_ADMIN": "APPROVED_BY_ADMIN",
     "REJECTED_BY_ADMIN": "REJECTED_BY_ADMIN",
-    "NIGOTIATE_BY_ADMIN": "NIGOTIATE_BY_ADMIN",
+    "NEGOTIATE_BY_ADMIN": "NEGOTIATE_BY_ADMIN",
 
     "APPROVED_BY_HOS": "APPROVED_BY_HOS",
     "REJECTED_BY_HOS": "REJECTED_BY_HOS",
-    "NIGOTIATE_BY_HOS": "NIGOTIATE_BY_HOS",
+    "NEGOTIATE_BY_HOS": "NEGOTIATE_BY_HOS",
 
-    "NIGOTIATE_BY_CEO": "NIGOTIATE_BY_CEO",
+    "NEGOTIATE_BY_CEO": "NEGOTIATE_BY_CEO",
     "APPROVED_BY_CEO": "APPROVED_BY_CEO",
     "REJECTED_BY_CEO": "REJECTED_BY_CEO",
 
     "ONBOARDED": "ONBOARDED"
 }
+
+export const REQUEST_STATUS_COLORS_LIST: any = {
+    "INITIATED": "lime",
+    "APPROVED_BY_ADMIN": "green",
+    "REJECTED_BY_ADMIN": "red",
+    "NEGOTIATE_BY_ADMIN": "blue",
+    "APPROVED_BY_HOS": "green",
+    "REJECTED_BY_HOS": "red",
+    "NEGOTIATE_BY_HOS": "blue",
+    "NEGOTIATE_BY_CEO": "blue",
+    "APPROVED_BY_CEO": "green",
+    "REJECTED_BY_CEO": "red",
+    "ONBOARDED": "purple",
+}
+
+//  <Tag color="magenta">magenta</Tag>
+//  <Tag color="red">red</Tag>
+//  <Tag color="volcano">volcano</Tag>
+//  <Tag color="orange">orange</Tag>
+//  <Tag color="gold">gold</Tag>
+//  <Tag color="lime">lime</Tag>
+//  <Tag color="green">green</Tag>
+//  <Tag color="cyan">cyan</Tag>
+//  <Tag color="blue">blue</Tag>
+//  <Tag color="geekblue">geekblue</Tag>
+//  <Tag color="purple">purple</Tag>
