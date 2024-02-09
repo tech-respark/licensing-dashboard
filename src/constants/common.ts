@@ -35,14 +35,20 @@ export const PRODUCTS_LIST = [
         "productId": 1,
         "productName": "RESPARK",
         "active": true
+    },
+    {
+        "id": 2,
+        "productId": 2,
+        "productName": "DEVOURIN",
+        "active": true
     }
 ]
 
 export const permissionsList = [
-    // { key: "dashboard", value: true, title: "Dashboard" },
-    { key: "requestsDashboard", value: false, title: "Requests Dashboard" },
-    { key: "clientsDashboard", value: false, title: "Clients Dashboard" },
-    { key: "reportsDashboard", value: true, title: "Reports Dashboard" },
+    // { key: "masterDashboard", value: true, title: "Dashboard" },
+    { key: "salesDashboard", value: false, title: "Sales" },
+    { key: "clients", value: false, title: "Clients" },
+    // { key: "reports", value: true, title: "Reports" },
     // { key: "usersDashboard", value: true, title: "Users Dashboard" },
 ]
 

@@ -6,17 +6,17 @@ import { Button, DatePicker, Divider, Popover, Select, Space, Typography } from 
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import { LuFilter, LuX } from 'react-icons/lu';
-import { INITIAL_FILTERS } from '.';
 import Styles from "./dashboardPage.module.scss";
 const { Text } = Typography;
 
-function Filters({ hide = "", initialFilters, setInitialFilters }: any) {
+function Filters({ defaultFilters, hide = "", initialFilters, setInitialFilters }: any) {
     const [statusOptions, setStatusOptions] = useState<any>([])
     const userData = useAppSelector(getAuthUserState);
     const [salesPersonsList, setSalesPersonsList] = useState([])
     const [openFiltersPopup, setOpenFiltersPopup] = useState(false)
     const [filters, setFilters] = useState(initialFilters);
     console.log(userData)
+
     useEffect(() => {
         setFilters(initialFilters);
     }, [openFiltersPopup])
@@ -28,7 +28,7 @@ function Filters({ hide = "", initialFilters, setInitialFilters }: any) {
         })
         setStatusOptions(options)
 
-        getUsersByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+        getUsersByProduct(userData?.productId).then((res: any) => {
             if (res.data) setSalesPersonsList(res.data.filter((u: any) => u.roleName == SALES_PERSON_ROLE).map((u: any) => (
                 { value: u.id, label: u.name }
             )))
@@ -38,12 +38,8 @@ function Filters({ hide = "", initialFilters, setInitialFilters }: any) {
 
     }, [])
 
-    const onChange = (value: string) => {
-        console.log(`selected ${value}`);
-    };
-
     const onClear = () => {
-        setInitialFilters(INITIAL_FILTERS);
+        setInitialFilters(defaultFilters);
         setOpenFiltersPopup(false);
     }
 

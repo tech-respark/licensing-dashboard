@@ -1,4 +1,3 @@
-import Loading from "@/app/loading";
 import { DATE_FORMAT } from "@/constants/common";
 import { removeObjRef } from "@/utils/common";
 import { Card, Descriptions, Divider, Modal, Space, Typography } from "antd";
@@ -12,7 +11,6 @@ const { Text } = Typography;
 function SalesDetailsModal({ isModalOpen, setIsModalOpen, salesDetails, handleModalResponse }: any) {
 
     const [requestDetails, setRequestDetails] = useState(salesDetails);
-    const [isLoading, setIsLoading] = useState(false)
 
     const handleCancel = () => {
         setIsModalOpen(false);
@@ -26,13 +24,12 @@ function SalesDetailsModal({ isModalOpen, setIsModalOpen, salesDetails, handleMo
 
     return (
         <>
-            {isLoading && <Loading />}
             <Modal title="Sales request details"
                 open={isModalOpen}
                 okText=""
                 footer={(_, { OkBtn, CancelBtn }) => (
                     <>
-                        {<RequestActions setIsLoading={setIsLoading} CancelBtn={<CancelBtn />} handleModalResponse={handleModalResponse} requestDetails={requestDetails} updateNewStatus={updateNewStatus} />}
+                        {<RequestActions CancelBtn={<CancelBtn />} handleModalResponse={handleModalResponse} requestDetails={requestDetails} updateNewStatus={updateNewStatus} />}
                     </>)}
                 onOk={() => {
 
@@ -45,6 +42,7 @@ function SalesDetailsModal({ isModalOpen, setIsModalOpen, salesDetails, handleMo
                         overflow: "auto"
                     }
                 }}
+                cancelText="Close"
                 onCancel={handleCancel}>
                 <Space direction="vertical">
                     <Card title={""}>

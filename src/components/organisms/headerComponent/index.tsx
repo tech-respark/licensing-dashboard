@@ -1,13 +1,15 @@
+import { ADMIN_ROLE, CEO_ROLE, PRODUCTS_LIST } from "@/constants/common";
 import NavigationMenus from "@/constants/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { getAuthUserState, setAuthUser } from "@/redux/slices/auth";
 import { getDarkModeState, toggleDarkMode } from "@/redux/slices/clientThemeConfig";
 import { showSuccessToast } from "@/redux/slices/toast";
-import { Avatar, Button, Card, Layout, Popover, Space, Typography } from "antd";
+import { removeObjRef } from "@/utils/common";
+import { Avatar, Button, Card, Layout, Popover, Select, Space, Typography } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback } from "react";
-import { LuCloudSunRain, LuLogOut, LuPen, LuUser } from 'react-icons/lu';
+import { LuCloudSunRain, LuLogOut, LuUser } from 'react-icons/lu';
 import Styles from "./headerComponent.module.scss";
 const { Header } = Layout;
 const { Text } = Typography;
@@ -33,6 +35,14 @@ function HeaderComponent() {
         </Space>
     }
 
+    const onChangeProduct = (product: any) => {
+        const user = removeObjRef(userData);
+        user.productId = product;
+        //fetch user permissions by using product id and set it into main user
+        dispatch(setAuthUser(user))
+        window.location.reload();
+    }
+
     const renderProfileContent = () => {
 
         const onLogout = () => {
@@ -43,20 +53,19 @@ function HeaderComponent() {
         }
 
         return <Space>
-            <Card
-                style={{ width: 300 }}
-                actions={[
-                    <Text onClick={onLogout} key="Edit"> <LuPen /> Edit</Text>,
-                    <Text onClick={onLogout} key="Logout"> <LuLogOut /> Logout</Text>,
-                ]}
-            >
+            <Card style={{ width: 300 }}
+                actions={[<Text onClick={onLogout} key="Logout"> <LuLogOut /> Logout</Text>]}>
                 <Meta
                     avatar={<Avatar src="https://api.dicebear.com/7.x/miniavs/svg?seed=8" />}
                     title={userData?.name}
-                    description={`Logged in as ${userData.roleName}`}
+                    description={`Logged in as ${userData?.roleName}`}
                 />
             </Card>
         </Space>
+    }
+
+    const getProductOptions = () => {
+        return PRODUCTS_LIST.map((p: any) => ({ value: p.productId, label: p.productName }))
     }
 
     return (
@@ -71,8 +80,15 @@ function HeaderComponent() {
             }}
             className={Styles.headerComponentWrap}
         >
-            <Space style={{ width: "100%" }}>
+            <Space style={{ width: "100%" }} size={20}>
                 <Text style={{ color: 'white', fontSize: 16 }}>{currentpage()}</Text>
+                {(userData?.roleName == ADMIN_ROLE || userData?.roleName == CEO_ROLE) && <Select
+                    style={{ width: "auto" }}
+                    placeholder="Select Product"
+                    value={userData?.productId}
+                    onChange={onChangeProduct}
+                    options={getProductOptions()}
+                />}
             </Space>
             <Space align="end" className={Styles.elements} size={15}>
 
@@ -80,8 +96,7 @@ function HeaderComponent() {
                     <Button shape='circle' size='large' icon={<LuBell />} />
                 </Popover> */}
 
-
-                {userData.roleName &&
+                {userData?.roleName &&
                     <Popover content={renderProfileContent()} title="" trigger="hover">
                         <Space>
                             <Space direction="vertical" size={0} style={{
@@ -90,7 +105,7 @@ function HeaderComponent() {
                                 alignItems: "flex-start"
                             }}>
                                 <Text style={{ color: "white" }}>{userData.name}</Text>
-                                <Text style={{ color: "white" }}>{userData.roleName}</Text>
+                                <Text style={{ color: "white" }}>{userData?.roleName}</Text>
                             </Space>
                             <Button shape='circle' size='large' icon={<LuUser />} />
                         </Space>

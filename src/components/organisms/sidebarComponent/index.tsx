@@ -21,7 +21,7 @@ function SidebarComponent({ collapsed, setCollapsed }: any) {
     useEffect(() => {
         const NAV_COPY = [...NavigationMenus];
         NAV_COPY.map((nav: any) => {
-            if ((nav.name == "Dashboard" || nav.name == "Role" || nav.name == "Modules" || nav.name == "Users") && !(userData.roleName == CEO_ROLE || userData.roleName == ADMIN_ROLE)) nav.active = false;
+            if ((nav.name == "Dashboard" || nav.name == "Role" || nav.name == "Modules" || nav.name == "Users") && !(userData?.roleName == CEO_ROLE || userData?.roleName == ADMIN_ROLE)) nav.active = false;
             else nav.active = true;
             if (nav.name == "Reports" && !Boolean(userData?.rolePermissions?.reportsDashboard)) nav.active = false;
         })

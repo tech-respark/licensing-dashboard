@@ -109,7 +109,7 @@ function RolesModal({ modalData, handleModalResponse }: any) {
 
         const details = {
             ...values,
-            "productId": userData?.userProductsList[0].productId,
+            "productId": userData?.productId,
             "rolePermissions": getPermissions(),
         }
         console.log("final details", details)
@@ -123,7 +123,7 @@ function RolesModal({ modalData, handleModalResponse }: any) {
         }
         const api = modalData?.role?.id ? updateRole : createRole;
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("User created successfully."))
+            dispatch(showSuccessToast("Role created successfully."))
             details.rolePermissions.id = res?.data.rolePermissions.id;
             handleModalResponse({ ...details, id: res?.data?.id })
             form.resetFields();
@@ -135,7 +135,7 @@ function RolesModal({ modalData, handleModalResponse }: any) {
     }
 
     return (
-        <Modal title={modalData?.role ? "Update User" : "Add New User"} open={modalData?.active}
+        <Modal title={modalData?.role ? "Update Role" : "Add New Role"} open={modalData?.active}
             okText="Submit"
             onOk={() => {
                 form
@@ -187,7 +187,7 @@ function RolesModal({ modalData, handleModalResponse }: any) {
                 <Card style={{ width: "100%" }}>
                     <Space direction="vertical">
                         <Space direction='vertical' size={20}>
-                            <Meta title="Roles Permissions" />
+                            <Meta title="Role Permissions" />
                             <Checkbox.Group
                                 style={{
                                     display: "flex",

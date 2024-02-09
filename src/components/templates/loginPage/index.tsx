@@ -8,9 +8,9 @@ import { getUserByCredentials } from '@/lib/internalApi/user';
 import { getAuthUserState, setAuthUser } from '@/redux/slices/auth';
 import { toggleLoader } from '@/redux/slices/loader';
 import { showErrorToast, showSuccessToast } from '@/redux/slices/toast';
-import { Button, Form, Input, theme } from 'antd';
+import { Button, Form, Input, Modal, Space, theme } from 'antd';
 import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import Styles from "./login.module.scss";
 
 
@@ -51,11 +51,13 @@ type FieldType = {
 function LoginPage() {
     const router = useRouter();
     const dispatch = useAppDispatch();
-    const { token } = theme.useToken()
-
+    const { token } = theme.useToken();
+    const [productSelectionModal, setProductSelectionModal] = useState<any>({ active: false, userData: null })
     const userData = useAppSelector(getAuthUserState)
+
     console.log("userData in dahsboard", userData)
     // if (Boolean(userData)) return router.push("/")
+
     useEffect(() => {
         if (Boolean(userData)) {
             return router.push("/")
@@ -66,14 +68,24 @@ function LoginPage() {
         dispatch(toggleLoader(true))
         getUserByCredentials(values)
             .then((response: any) => {
-                dispatch(setAuthUser(response.data))
-                dispatch(showSuccessToast("Perfect! You're signed in successfully."))
-                if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
-                    router.push("/")
-                } else {
-                    router.push("/sales")
-                }
+                // setProductSelectionModal({ active: true, userData: response.data })
                 dispatch(toggleLoader(false))
+
+                if (response.data?.userProductsList.length > 1) {
+                    setProductSelectionModal({ active: true, userData: response.data })
+                } else {
+                    response.data.productId = response.data.userProductsList[0].productId;
+                    response.data.roleName = response.data.userProductsList[0].roleName || response.data.roleName;
+                    response.data.rolePermissions = response.data.userProductsList[0].rolePermissions || response.data.rolePermissions;
+                    dispatch(setAuthUser(response.data))
+                    dispatch(showSuccessToast("Perfect! You're signed in successfully."))
+                    if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
+                        router.push("/")
+                    } else {
+                        router.push("/sales")
+                    }
+                    dispatch(toggleLoader(false))
+                }
             })
             .catch((err) => {
                 dispatch(toggleLoader(false))
@@ -93,6 +105,26 @@ function LoginPage() {
         console.log('Failed:', errorInfo);
         dispatch(showErrorToast(errorInfo.errorFields[0].errors[0]))
     };
+
+    const onSelectProduct = () => {
+        const selectedProduct = productSelectionModal.userData.userProductsList.find((p: any) => p.selected)
+        if (Boolean(selectedProduct)) {
+            const userCopy = { ...productSelectionModal.userData };
+            userCopy.productId = selectedProduct.productId;
+            userCopy.roleName = selectedProduct.roleName || productSelectionModal.userData?.roleName || ADMIN_ROLE;
+            userCopy.rolePermissions = selectedProduct.rolePermissions || productSelectionModal.userData?.rolePermissions;
+            dispatch(setAuthUser(userCopy))
+            dispatch(showSuccessToast("Perfect! You're signed in successfully."))
+            if (userCopy.roleName == CEO_ROLE || userCopy.roleName == ADMIN_ROLE) {
+                router.push("/")
+            } else {
+                router.push("/sales")
+            }
+            dispatch(toggleLoader(false))
+        } else {
+            dispatch(showErrorToast("Please select product"))
+        }
+    }
 
     return (
         <div className={Styles.loginPageWrap}>
@@ -138,6 +170,26 @@ function LoginPage() {
                     </Form.Item>
                 </Form>
             </div>
+            <Modal title="Select Product" open={productSelectionModal.active}
+                onOk={onSelectProduct}
+                onCancel={() => setProductSelectionModal({ active: false, userData: null })}>
+                <Space direction='vertical'>
+                    {productSelectionModal?.userData?.userProductsList.map((product: any, i: any) => {
+                        return <Button
+                            key={product.productId}
+                            type={product.selected ? "primary" : "default"}
+                            onClick={() => {
+                                const userCopy = { ...productSelectionModal.userData };
+                                userCopy.userProductsList?.map((p: any) => p.selected = false);
+                                userCopy.userProductsList[i].selected = true;
+                                setProductSelectionModal({ ...productSelectionModal, userData: userCopy })
+                            }}
+                        >
+                            {product.productName}
+                        </Button>
+                    })}
+                </Space>
+            </Modal>
         </div>
     )
 }

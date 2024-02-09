@@ -30,7 +30,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getRolesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+        getRolesByProduct(userData?.productId).then((res: any) => {
             if (res.data) setRolesList(res.data)
         }).catch(function (error: any) {
             console.log(`/getRolesByProduct `, error);
@@ -110,7 +110,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
     }, [modalData])
 
     const getPermissions = () => {
-        const permissionsListCopy: any = { productId: userData?.userProductsList[0].productId };
+        const permissionsListCopy: any = { productId: userData?.productId };
         permissionsList.map((p: any) => {
             permissionsListCopy[p.key] = checkedList.includes(p.key) ? 1 : 0
         })
@@ -147,7 +147,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
     }
 
     const getRolesOptions = () => {
-        return rolesList.filter((r: any) => r.roleName != "CEO").map((r: any) => ({ value: r.id, label: r.roleName }))
+        return rolesList.filter((r: any) => r.roleName != "CEO" && r.active).map((r: any) => ({ value: r.id, label: r.roleName }))
     }
 
     return (

@@ -14,7 +14,7 @@ function ModulePage() {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getModulesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+        getModulesByProduct(userData?.productId).then((res: any) => {
             if (res.data) setModulesList(res.data)
         }).catch(function (error: any) {
             console.log(`/getUsersByProduct `, error);

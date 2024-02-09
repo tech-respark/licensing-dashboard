@@ -4,6 +4,7 @@ import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { updateRequestStatus } from '@/lib/internalApi/requests';
 import { getAuthUserState } from '@/redux/slices/auth';
+import { toggleLoader } from '@/redux/slices/loader';
 import { showErrorToast, showSuccessToast } from '@/redux/slices/toast';
 import { Button, Input, Popconfirm, Space, Tag, Typography } from 'antd';
 import dayjs from 'dayjs';
@@ -49,7 +50,7 @@ export type ACTION_TYPE = {
     action: string
 }
 
-function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestDetails, updateNewStatus, setIsLoading }: any) {
+function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestDetails, updateNewStatus }: any) {
 
     const [remarkPopup, setRemarkPopup] = useState({ active: false, remark: "" })
     const [negotiationPopup, setNegotiationPopup] = useState({ active: false, remark: "", price: 0 })
@@ -164,7 +165,7 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
 
     const updateRequest = (newStatus: any) => {
 
-        setIsLoading(true)
+        dispatch(toggleLoader(true))
         updateRequestStatus({
             id: requestDetails.id,
             updatedStatus: newStatus
@@ -174,11 +175,11 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
             setRemarkPopup({ active: false, remark: "" })
             setNegotiationPopup({ active: false, remark: "", price: 0 })
             handleModalResponse()
-            setIsLoading(false)
+            dispatch(toggleLoader(false))
         })
             .catch((error: any) => {
                 console.log(error)
-                setIsLoading(false)
+                dispatch(toggleLoader(false))
                 dispatch(showErrorToast(`Request updation failed error: ${error}`))
             })
     }
@@ -224,7 +225,8 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
                             {inititatedStatus.createdBy} ({dayjs(inititatedStatus.createdOn).format(DATE_FORMAT)})
                             and it is in {currentStatus.status} ({dayjs(inititatedStatus.createdOn).format(DATE_FORMAT)}) state.</>
                         <br />
-                        {Boolean(negotiationStatus) && <>Negotiation price is {negotiationStatus?.price}</>}
+                        {Boolean(negotiationStatus) && <>Negotiation price is: {negotiationStatus?.price}</>}.&nbsp;
+                        {Boolean(negotiationStatus) && Boolean(negotiationStatus?.remark) && <>Negotiation remark is: {negotiationStatus?.remark}</>}
                         {Boolean(rejectionStatus) && <>Request rejected due to {rejectionStatus?.remark}</>}
                     </Tag>
                     : <>

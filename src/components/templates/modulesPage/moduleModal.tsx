@@ -64,7 +64,7 @@ function ModuleModal({ modalData, handleModalResponse }: any) {
 
     const onCreate = (values: any) => {
 
-        const details = { ...values, productId: userData?.userProductsList[0].productId }
+        const details = { ...values, productId: userData?.productId }
         if (modalData?.module?.id) {
             details.id = modalData?.module?.id;
             details.modifiedBy = userData.name;

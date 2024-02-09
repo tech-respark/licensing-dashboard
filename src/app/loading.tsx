@@ -3,8 +3,6 @@ import styles from './page.module.css';
 
 function Loading({ page }: any) {
 
-    console.log("loading page:", page)
-
     return (
         <main className={styles.loadingWrap}>
             <div className={styles.logoWrap}>

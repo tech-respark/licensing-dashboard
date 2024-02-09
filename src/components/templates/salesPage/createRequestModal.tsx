@@ -1,10 +1,10 @@
-import Loading from "@/app/loading";
 import { ADMIN_ROLE, DATE_FORMAT, REQUEST_STATUSES, SALES_PERSON_ROLE, getDurationOptions } from "@/constants/common";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { getClientById } from "@/lib/internalApi/clients";
 import { createRequest, updateRequest } from "@/lib/internalApi/requests";
 import { getAuthUserState } from "@/redux/slices/auth";
+import { toggleLoader } from "@/redux/slices/loader";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
 import { removeObjRef } from "@/utils/common";
 import { Button, Card, Checkbox, DatePicker, Descriptions, Divider, Form, Input, Modal, Select, Space, Typography, theme } from "antd";
@@ -54,7 +54,6 @@ const DummyModule = {
 function CreateRequestModal({ modalData, handleModalResponse, clientsList, modulesList, usersList, setClientsList }: any) {
     const [form] = Form.useForm();
     const { token } = theme.useToken()
-    const dispatch = useAppDispatch();
     const userData = useAppSelector(getAuthUserState);
     const [showAddClientModal, setShowAddClientModal] = useState(false);
     const [storesDetails, setStoresDetails] = useState<any>([]);
@@ -63,7 +62,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
     const defaultDuration: any = "yearlyPrice";
     const [rejectionRemarkPoppup, setRejectionRemarkPoppup] = useState({ active: false, remark: "" })
     const [requestDetails, setRequestDetails] = useState(modalData?.request)
-    const [isLoading, setIsLoading] = useState(false)
+    const dispatch = useAppDispatch()
 
     useEffect(() => {
         if (Boolean(modalData?.request?.id) && Boolean(modulesList?.length)) {
@@ -197,13 +196,13 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
 
         const requestData = {
             ...requestDetails,
-            "productId": userData?.userProductsList[0].productId,
+            "productId": userData?.productId,
             "tenantId": values.client,
             "salesPersonName": usersList.find((s: any) => s.id == values.salesPerson).name,
             "salesPersonId": values.salesPerson,
             "systemGeneratedPrice": Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)),
             "discountPercentage": Number(discountPercentage),
-            "sellingPrice": Number(Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))) - Number((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed(2))),
+            "sellingPrice": Number(Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))) - Number((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed())),
             "type": "NEW",
             "remark": form.getFieldValue("remark"),
             "customerExpectedPrice": form.getFieldValue("customerExpectedPrice"),
@@ -217,7 +216,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
 
     const onSubmit = (values: any) => {
 
-        const details = { ...values, productId: userData?.userProductsList[0].productId }
+        const details = { ...values, productId: userData?.productId }
         if (requestDetails?.id) {
             details.id = requestDetails?.id;
             details.modifiedBy = userData.name;
@@ -228,16 +227,16 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         }
 
         const api = requestDetails?.id ? updateRequest : createRequest;
-        setIsLoading(true)
+        dispatch(toggleLoader(true))
         api(details).then((res: any) => {
             dispatch(showSuccessToast("Request created successfully."))
             handleModalResponse(res.data);
             form.resetFields();
-            setIsLoading(false)
+            dispatch(toggleLoader(false))
         })
             .catch((error: any) => {
                 console.log(error)
-                setIsLoading(false)
+                dispatch(toggleLoader(false))
                 dispatch(showErrorToast(`Request creation failed error: ${error}`))
             })
     }
@@ -299,7 +298,6 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
             footer={(_, { OkBtn, CancelBtn }) => (
                 <>
                     {<RequestActions
-                        setIsLoading={setIsLoading}
                         CancelBtn={<CancelBtn />}
                         handleModalResponse={handleModalResponse}
                         requestDetails={requestDetails}
@@ -333,7 +331,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                         <Space direction="vertical">
                             <Space>
                                 <Form.Item
-                                    label="Client Details"
+                                    label="Client Name"
                                     name="client"
                                     rules={[{ required: true, message: `Please select client` }]}
                                 >
@@ -353,7 +351,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                             </Space>
 
                             <Form.Item
-                                label="Sales Persons Details"
+                                label="Sales Person Name"
                                 name="salesPerson"
                                 rules={[{ required: true, message: `Please select sales person` }]}
                             >
@@ -431,14 +429,30 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                                                 <Text>Select Modules</Text>
                                                 {storeDetails.modulesList.map((moduleDetails: any, moduleIndex: number) => {
                                                     return <React.Fragment key={moduleIndex}>
-                                                        <Checkbox checked={moduleDetails.selected}
-                                                            onChange={() => {
-                                                                const storesCopy = [...storesDetails];
-                                                                storesCopy[storeIndex].modulesList[moduleIndex].selected = !storesCopy[storeIndex].modulesList[moduleIndex].selected;
-                                                                updateTotal(storesCopy)
-                                                            }}>
-                                                            {moduleDetails.name}
-                                                        </Checkbox>
+                                                        <Space style={{
+                                                            display: "flex",
+                                                            justifyContent: "space-between",
+                                                            alignItems: "center"
+                                                        }}>
+                                                            <Checkbox checked={moduleDetails.selected}
+                                                                onChange={() => {
+                                                                    const storesCopy = [...storesDetails];
+                                                                    storesCopy[storeIndex].modulesList[moduleIndex].selected = !storesCopy[storeIndex].modulesList[moduleIndex].selected;
+                                                                    updateTotal(storesCopy)
+                                                                }}>
+                                                                {moduleDetails.name}
+                                                            </Checkbox>
+                                                            <Input
+                                                                readOnly={userData?.roleName !== ADMIN_ROLE}
+                                                                placeholder="Module Price"
+                                                                value={moduleDetails[form.getFieldValue("duration")]}
+                                                                onChange={(e: any) => {
+                                                                    const storesCopy = [...storesDetails];
+                                                                    storesCopy[storeIndex].modulesList[moduleIndex][form.getFieldValue("duration")] = Number(e.target.value);
+                                                                    updateTotal(storesCopy)
+                                                                }}
+                                                            />
+                                                        </Space>
                                                     </React.Fragment>
                                                 })}
                                             </Space>
@@ -464,19 +478,19 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                                 <Input />
                             </Form.Item>
                             {(getCurrentStatus(requestDetails) == REQUEST_STATUSES.APPROVED_BY_ADMIN || getCurrentStatus(requestDetails) == REQUEST_STATUSES.APPROVED_BY_CEO) ? <>
-                                <Descriptions column={1} title="Pricing Breakdown">
+                                <Descriptions column={2} title="Pricing Breakdown">
                                     <Descriptions.Item label="System Generated Total">{requestDetails.systemGeneratedPrice}</Descriptions.Item>
                                     {Boolean(requestDetails.discountPercentage) && <Descriptions.Item label="Dicount">{requestDetails.discountPercentage} %</Descriptions.Item>}
+                                    {Boolean(requestDetails.discountValue) && <Descriptions.Item label="Dicounted Amount">{requestDetails.discountValue}</Descriptions.Item>}
                                     <Descriptions.Item label="Amount To Pay">{requestDetails.sellingPrice}</Descriptions.Item>
                                 </Descriptions>
                             </> : <>
-                                <Descriptions column={1} title="Pricing Breakdown">
-                                    <Descriptions.Item label="System Generated Total">{Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))}</Descriptions.Item>
+                                <Descriptions column={2} title="Pricing Breakdown">
                                     {Boolean(discountPercentage) && <Descriptions.Item label="Dicount">{Number(discountPercentage)} %</Descriptions.Item>}
-                                    {Boolean(discountPercentage) && <Descriptions.Item label="Dicounted Amount">{((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed(2))).toFixed(2)}</Descriptions.Item>}
-                                    <Descriptions.Item label="Amount To Pay">{(Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))) - Number((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed(2)))}</Descriptions.Item>
+                                    {Boolean(discountPercentage) && <Descriptions.Item label="Dicounted Amount">{((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed())).toFixed(0)}</Descriptions.Item>}
+                                    <Descriptions.Item label="System Generated Total">{Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))}</Descriptions.Item>
+                                    <Descriptions.Item label="Amount To Pay">{((Number(storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0))) - Number((Number(discountPercentage) / 100) * Number((storesDetails.reduce((a: any, b: any) => a + Number(b.total), 0)).toFixed(0)))).toFixed(0)}</Descriptions.Item>
                                 </Descriptions>
-
                             </>}
 
                         </Space>
@@ -484,7 +498,6 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                 </Card>
             </Space>
             {showAddClientModal && <ClientModal modalData={{ active: true, client: null }} handleModalResponse={handleAddClientModalResponse} />}
-            {isLoading && <Loading />}
         </Modal>
     )
 }

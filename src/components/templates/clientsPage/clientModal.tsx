@@ -96,7 +96,7 @@ function ClientModal({ modalData, handleModalResponse }: any) {
         console.log(values)
         const details = {
             ...values,
-            productId: userData?.userProductsList[0].productId
+            productId: userData?.productId
         }
         if (modalData?.client?.id) {
             details.id = modalData?.client?.id;

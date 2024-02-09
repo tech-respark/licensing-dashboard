@@ -14,7 +14,7 @@ function RolesPage() {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getRolesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+        getRolesByProduct(userData?.productId).then((res: any) => {
             if (res.data) setRolesList(res.data)
         }).catch(function (error: any) {
             console.log(`/getRolesByProduct `, error);

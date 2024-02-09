@@ -1,33 +1,24 @@
 "use client"
-import Loading from "@/app/loading";
-import { DATE_FORMAT, SALES_PERSON_ROLE } from "@/constants/common";
+import { ADMIN_ROLE, DATE_FORMAT, SALES_PERSON_ROLE } from "@/constants/common";
+import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { getClientsByProduct } from "@/lib/internalApi/clients";
 import { getModulesByProduct } from "@/lib/internalApi/module";
 import { getAllRequests, getRequestById } from "@/lib/internalApi/requests";
 import { getUsersByProduct } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
+import { toggleLoader } from "@/redux/slices/loader";
 import type { TableProps } from 'antd';
 import { Button, Card, Space, Table } from "antd";
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import Filters from "../dashboardPage/filters";
+import SalesDetailsModal from "../dashboardPage/salesDetailsModal";
+import { getCurrentStatus } from "../requestUtils";
 import { TABLE_COLUMNS } from "./constant";
 import CreateRequestModal from "./createRequestModal";
+import { REQUEST_STATUSES } from "./requestActions";
 import Styles from "./salespage.module.scss";
-
-export const INITIAL_FILTERS = {
-    "filters": [],
-    "productId": 1,
-    "userId": null,
-    "currentStatus": null,
-    "sortBy": "DESC",
-    "orderBy": "",
-    "fromDate": new Date(),
-    "toDate": new Date(),
-    "pageNumber": 1,
-    "recordsPerPage": 10,
-}
 
 const dummyRequest = {
     "id": 30,
@@ -75,19 +66,32 @@ function SalesPage() {
     const [clientsList, setClientsList] = useState<any[]>([]);
     const [modulesList, setModulesList] = useState<any[]>([]);
     const [usersList, setUsersList] = useState<any[]>([]);
-    const [isLoading, setIsLoading] = useState(false)
     const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
-    const [filters, setFilters] = useState(INITIAL_FILTERS)
+    const dispatch = useAppDispatch()
+
+    const defaultFilters = {
+        "filters": [],
+        "productId": userData?.productId,
+        "userId": null,
+        "currentStatus": null,
+        "sortBy": "DESC",
+        "orderBy": "",
+        "fromDate": new Date(),
+        "toDate": new Date(),
+        "pageNumber": 1,
+        "recordsPerPage": 10,
+    }
+    const [filters, setFilters] = useState(defaultFilters)
 
     const fetchRequests = () => {
-        setIsLoading(true)
+        dispatch(toggleLoader(true))
         getAllRequests({
             ...filters,
             userId: Boolean(userData?.rolePermissions?.requestsDashboard) ? filters.userId : userData?.id,
             fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
             toDate: dayjs(filters.toDate).format(DATE_FORMAT)
         }).then((res: any) => {
-            setIsLoading(false)
+            dispatch(toggleLoader(false))
             if (res.data) {
                 setSalesRequestsList(res.data)
             }
@@ -107,18 +111,18 @@ function SalesPage() {
                 let usersList: any = [];
                 let modulesList: any = [];
 
-                getClientsByProduct(INITIAL_FILTERS).then((res: any) => {
+                getClientsByProduct(defaultFilters).then((res: any) => {
                     if (res.data) clientsList = res.data;
                 }).catch(function (error: any) {
                     console.log(`/getClientsByProduct `, error);
                 });
 
-                getUsersByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+                getUsersByProduct(userData?.productId).then((res: any) => {
                     if (res.data) usersList = res.data.filter((u: any) => u.roleName == SALES_PERSON_ROLE);
                 }).catch(function (error: any) {
                     console.log(`/getUsersByProduct `, error);
                 });
-                getModulesByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+                getModulesByProduct(userData?.productId).then((res: any) => {
                     if (res.data) modulesList = res.data;
                 }).catch(function (error: any) {
                     console.log(`/getModulesByProduct `, error);
@@ -165,23 +169,23 @@ function SalesPage() {
                     extra={
                         <Space>
                             <Button type='primary' onClick={() => {
-                                setIsLoading(true);
+                                dispatch(toggleLoader(true));
                                 fetchBaseData().then(() => {
-                                    setIsLoading(false);
+                                    dispatch(toggleLoader(false));
                                     setModalData({ active: true, request: null })
                                 })
                             }}>Add New Request</Button>
-                            <Filters setInitialFilters={setFilters} initialFilters={filters} />
+                            <Filters defaultFilters={defaultFilters} setInitialFilters={setFilters} initialFilters={filters} />
                         </Space>}
                 >
                     <Table
                         onRow={(record: any) => {
                             return {
                                 onClick: () => {
-                                    setIsLoading(true);
+                                    dispatch(toggleLoader(true));
                                     fetchBaseData().then(() => {
                                         getRequestById(record.id).then((res: any) => {
-                                            setIsLoading(false);
+                                            dispatch(toggleLoader(false));
                                             console.log("original request", res.data)
                                             setModalData({ active: true, request: res.data })
                                         })
@@ -193,21 +197,34 @@ function SalesPage() {
                         bordered
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={TABLE_COLUMNS().filter((c: any) => c.key !== "expiryDate")}
+                        columns={TABLE_COLUMNS().filter((c: any) => (c.key !== "expiryDate") && (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.requestsDashboard) : true))}
                         dataSource={data}
                         onChange={handleChange}
                     />
                 </Card>
             </Space>
-            {isLoading && <Loading />}
 
-            {modalData.active && <CreateRequestModal
-                clientsList={clientsList}
-                modulesList={modulesList}
-                usersList={usersList}
-                modalData={modalData}
-                setClientsList={setClientsList}
-                handleModalResponse={handleModalResponse} />}
+            {modalData.active && <>
+
+                {Boolean(!modalData.request) || (userData?.roleName == ADMIN_ROLE || userData?.roleName == SALES_PERSON_ROLE) && (getCurrentStatus(modalData.request) !== REQUEST_STATUSES.ONBOARDED && getCurrentStatus(modalData.request) !== REQUEST_STATUSES.APPROVED_BY_ADMIN && getCurrentStatus(modalData.request) !== REQUEST_STATUSES.APPROVED_BY_CEO && !getCurrentStatus(modalData.request)?.toLowerCase().includes("reject")) ? <>
+                    <CreateRequestModal
+                        clientsList={clientsList}
+                        modulesList={modulesList}
+                        usersList={usersList}
+                        modalData={modalData}
+                        setClientsList={setClientsList}
+                        handleModalResponse={handleModalResponse}
+                    />
+                </> : <>
+                    <SalesDetailsModal
+                        handleModalResponse={handleModalResponse}
+                        isModalOpen={modalData.active}
+                        setIsModalOpen={() => setModalData({ active: false, request: null })}
+                        salesDetails={modalData.request}
+                    />
+                </>}
+
+            </>}
         </>
     )
 }

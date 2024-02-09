@@ -14,7 +14,7 @@ function UsersPage() {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getUsersByProduct(userData?.userProductsList[0].productId).then((res: any) => {
+        getUsersByProduct(userData?.productId).then((res: any) => {
             if (res.data) setUsersList(res.data)
         }).catch(function (error: any) {
             console.log(`/getUsersByProduct `, error);
