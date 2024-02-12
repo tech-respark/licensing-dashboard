@@ -14,11 +14,13 @@ function UsersPage() {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getUsersByProduct(userData?.productId).then((res: any) => {
-            if (res.data) setUsersList(res.data)
-        }).catch(function (error: any) {
-            console.log(`/getUsersByProduct `, error);
-        });
+        if (userData?.productId) {
+            getUsersByProduct(userData?.productId).then((res: any) => {
+                if (res.data) setUsersList(res.data)
+            }).catch(function (error: any) {
+                console.log(`/getUsersByProduct `, error);
+            });
+        }
     }, [])
 
     const handleModalResponse = (data: any) => {

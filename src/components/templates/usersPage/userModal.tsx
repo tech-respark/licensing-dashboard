@@ -30,11 +30,13 @@ function UserModal({ modalData, handleModalResponse }: any) {
     const userData = useAppSelector(getAuthUserState);
 
     useEffect(() => {
-        getRolesByProduct(userData?.productId).then((res: any) => {
-            if (res.data) setRolesList(res.data)
-        }).catch(function (error: any) {
-            console.log(`/getRolesByProduct `, error);
-        });
+        if (userData?.productId) {
+            getRolesByProduct(userData?.productId).then((res: any) => {
+                if (res.data) setRolesList(res.data)
+            }).catch(function (error: any) {
+                console.log(`/getRolesByProduct `, error);
+            });
+        }
     }, [])
 
     interface FieldData {

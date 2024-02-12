@@ -67,7 +67,7 @@ function ClientsPage() {
     }
 
     useEffect(() => {
-        fetchRequests()
+        if (userData?.productId) fetchRequests()
     }, [filters])
 
     const handleModalResponse = (data: any) => {

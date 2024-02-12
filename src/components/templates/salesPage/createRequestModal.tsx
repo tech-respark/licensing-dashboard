@@ -80,11 +80,15 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                     const moduleDetails = removeObjRef(module);
                     if (store?.modulesList?.find((m: any) => m.moduleId == moduleDetails.id)?.id) {
                         moduleDetails.selected = true;
-                    } else moduleDetails.selected = false;
+                        moduleDetails.modulePrice = store?.modulesList?.find((m: any) => m.moduleId == moduleDetails.id)?.modulePrice;
+                    } else {
+                        moduleDetails.selected = false;
+                        // moduleDetails.modulePrice = moduleDetails[defaultDuration];
+                    }
                     storeDetails.modulesList.push(moduleDetails)
                 })
 
-                storeDetails.total = storeDetails.modulesList.reduce((a: any, b: any) => a + (b.selected ? Number(b[form.getFieldValue("duration")]) : 0), 0)
+                storeDetails.total = storeDetails.modulesList.reduce((a: any, b: any) => a + (b.selected ? Number(b.modulePrice) : 0), 0)
 
                 //update start and end date
                 storeDetails.startDate = storeDetails.startDate;
@@ -98,13 +102,12 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
     }, [modalData, modulesList])
 
     useEffect(() => {
-        console.log("storesDetails", storesDetails)
         setError({ id: "", text: "" })
     }, [storesDetails])
 
     const updateTotal = (storesDetails: any) => {
         storesDetails.map((store: any) => {
-            store.total = store.modulesList.reduce((a: any, b: any) => a + (b.selected ? Number(b[form.getFieldValue("duration")]) : 0), 0)
+            store.total = store.modulesList.reduce((a: any, b: any) => a + (b.selected ? Number(b.modulePrice) : 0), 0)
         })
         setStoresDetails(removeObjRef(storesDetails))
     }
@@ -140,6 +143,9 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                         store.startDate = dayjs(dayjs()).format(DATE_FORMAT);
                         store.endDate = getEndDate(store.startDate, defaultDuration)
                         store.modulesList = modulesList.filter((m: any) => m.active);
+                        modulesList.map((m: any) => {
+                            m.modulePrice = m[form.getFieldValue("duration")]
+                        });
                     })
                     setStoresDetails(stores)
                 })
@@ -151,6 +157,8 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         if (form.getFieldValue("duration") && Boolean(storesDetails?.length)) {
             storesDetails.map((store: any) => {
                 store.endDate = getEndDate(store.startDate, form.getFieldValue("duration"));
+                store.modulesList.map((m: any) => m.modulePrice = (m.modulePrice || m[form.getFieldValue("duration")]))
+                console.log("store.modulesList", store.modulesList)
             })
             updateTotal(storesDetails)
         }
@@ -170,7 +178,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                 "endDate": dayjs(store.endDate).format(DATE_FORMAT),
                 "generatedStorePrice": Number(store.total),
                 "isTrial": false,
-                "modulesList": store.modulesList.filter((module: any) => module.selected).map((m: any) => ({ moduleId: m.id }))
+                "modulesList": store.modulesList.filter((module: any) => module.selected).map((m: any) => ({ moduleId: m.id, modulePrice: m.modulePrice }))
             })
         })
         return storesList;
@@ -443,12 +451,12 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                                                                 {moduleDetails.name}
                                                             </Checkbox>
                                                             <Input
-                                                                readOnly={userData?.roleName !== ADMIN_ROLE}
+                                                                readOnly={(userData?.roleName !== ADMIN_ROLE) ? true : !moduleDetails.selected}
                                                                 placeholder="Module Price"
-                                                                value={moduleDetails[form.getFieldValue("duration")]}
+                                                                value={moduleDetails.modulePrice}
                                                                 onChange={(e: any) => {
                                                                     const storesCopy = [...storesDetails];
-                                                                    storesCopy[storeIndex].modulesList[moduleIndex][form.getFieldValue("duration")] = Number(e.target.value);
+                                                                    storesCopy[storeIndex].modulesList[moduleIndex].modulePrice = Number(e.target.value);
                                                                     updateTotal(storesCopy)
                                                                 }}
                                                             />

@@ -99,7 +99,7 @@ function SalesPage() {
     }
 
     useEffect(() => {
-        fetchRequests()
+        if (userData?.productId) fetchRequests()
     }, [filters])
 
     const fetchBaseData = () => {
@@ -107,9 +107,9 @@ function SalesPage() {
             if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0) {
                 res(true)
             } else {
-                let clientsList: any = [];
-                let usersList: any = [];
-                let modulesList: any = [];
+                let clientsList: any = null;
+                let usersList: any = null;
+                let modulesList: any = null;
 
                 getClientsByProduct(defaultFilters).then((res: any) => {
                     if (res.data) clientsList = res.data;
@@ -118,7 +118,7 @@ function SalesPage() {
                 });
 
                 getUsersByProduct(userData?.productId).then((res: any) => {
-                    if (res.data) usersList = res.data.filter((u: any) => u.roleName == SALES_PERSON_ROLE);
+                    if (res.data) usersList = res.data.filter((u: any) => u.userProductsList[0].roleName == SALES_PERSON_ROLE);
                 }).catch(function (error: any) {
                     console.log(`/getUsersByProduct `, error);
                 });
@@ -128,7 +128,7 @@ function SalesPage() {
                     console.log(`/getModulesByProduct `, error);
                 });
                 const dataInterval = setInterval(() => {
-                    if (clientsList.length != 0 && modulesList.length != 0 && usersList.length != 0) {
+                    if (Boolean(clientsList) && Boolean(modulesList) && Boolean(usersList)) {
                         setClientsList(clientsList)
                         setUsersList(usersList)
                         setModulesList(modulesList)
