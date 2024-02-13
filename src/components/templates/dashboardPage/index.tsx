@@ -68,7 +68,7 @@ function DashboardPage() {
                 });
 
                 getUsersByProduct(userData?.productId).then((res: any) => {
-                    if (res.data) usersList = res.data.filter((u: any) => u.userProductsList[0].roleName == SALES_PERSON_ROLE);
+                    if (res.data) usersList = res.data.filter((u: any) => u.userProductsList.find((r: any) => r.productId == userData?.productId).roleName == SALES_PERSON_ROLE);
                 }).catch(function (error: any) {
                     console.log(`/getUsersByProduct `, error);
                 });

@@ -1,5 +1,6 @@
 "use client"
 import { useAppSelector } from "@/hooks/useAppSelector";
+import { getRolesByProduct } from "@/lib/internalApi/roles";
 import { getUsersByProduct } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { Button, Card, Space } from "antd";
@@ -12,6 +13,7 @@ function UsersPage() {
     const [modalData, setModalData] = useState({ active: false, user: null });
     const [usersList, setUsersList] = useState<any[]>([]);
     const userData = useAppSelector(getAuthUserState);
+    const [rolesList, setRolesList] = useState<any[]>([]);
 
     useEffect(() => {
         if (userData?.productId) {
@@ -19,6 +21,11 @@ function UsersPage() {
                 if (res.data) setUsersList(res.data)
             }).catch(function (error: any) {
                 console.log(`/getUsersByProduct `, error);
+            });
+            getRolesByProduct(userData?.productId).then((res: any) => {
+                if (res.data) setRolesList(res.data)
+            }).catch(function (error: any) {
+                console.log(`/getRolesByProduct `, error);
             });
         }
     }, [])
@@ -61,7 +68,7 @@ function UsersPage() {
                     </Card>
                 })}
             </Space>
-            <UserModal modalData={modalData} handleModalResponse={handleModalResponse} />
+            <UserModal rolesList={rolesList} modalData={modalData} handleModalResponse={handleModalResponse} />
         </Space>
     )
 }

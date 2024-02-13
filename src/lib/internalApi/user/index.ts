@@ -29,7 +29,13 @@ export const getUsersByProduct = (productId: any) => {
     return new Promise((res, rej) => {
         axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/usersByProductId?productId=${productId}`)
             .then((response: any) => {
-                if (response.data) res(response.data);
+                if (response.data) {
+                    response.data.map((user: any) => {
+                        user.roleName = user.userProductsList.find((r: any) => r.productId == productId).roleName;
+                        user.roleId = user.userProductsList.find((r: any) => r.productId == productId).roleId;
+                    })
+                    res(response.data)
+                }
                 else rej(response.data.message)
             }).catch(function (error: any) {
                 rej(error.message);

@@ -84,18 +84,21 @@ function SalesPage() {
     const [filters, setFilters] = useState(defaultFilters)
 
     const fetchRequests = () => {
-        dispatch(toggleLoader(true))
-        getAllRequests({
-            ...filters,
-            userId: Boolean(userData?.rolePermissions?.requestsDashboard) ? filters.userId : userData?.id,
-            fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
-            toDate: dayjs(filters.toDate).format(DATE_FORMAT)
-        }).then((res: any) => {
-            dispatch(toggleLoader(false))
-            if (res.data) {
-                setSalesRequestsList(res.data)
-            }
-        })
+        if (Boolean(userData)) {
+
+            dispatch(toggleLoader(true))
+            getAllRequests({
+                ...filters,
+                userId: Boolean(userData?.rolePermissions?.salesDashboard) ? filters.userId : userData?.id,
+                fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
+                toDate: dayjs(filters.toDate).format(DATE_FORMAT)
+            }).then((res: any) => {
+                dispatch(toggleLoader(false))
+                if (res.data) {
+                    setSalesRequestsList(res.data)
+                }
+            })
+        }
     }
 
     useEffect(() => {
@@ -118,7 +121,7 @@ function SalesPage() {
                 });
 
                 getUsersByProduct(userData?.productId).then((res: any) => {
-                    if (res.data) usersList = res.data.filter((u: any) => u.userProductsList[0].roleName == SALES_PERSON_ROLE);
+                    if (res.data) usersList = res.data.filter((u: any) => u.userProductsList.find((r: any) => r.productId == userData?.productId).roleName == SALES_PERSON_ROLE);
                 }).catch(function (error: any) {
                     console.log(`/getUsersByProduct `, error);
                 });
@@ -197,7 +200,7 @@ function SalesPage() {
                         bordered
                         pagination={{ pageSize: 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={TABLE_COLUMNS().filter((c: any) => (c.key !== "expiryDate") && (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.requestsDashboard) : true))}
+                        columns={TABLE_COLUMNS().filter((c: any) => (c.key !== "expiryDate") && (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.salesDashboard) : true))}
                         dataSource={data}
                         onChange={handleChange}
                     />

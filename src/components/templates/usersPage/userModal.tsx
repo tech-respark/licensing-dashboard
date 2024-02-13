@@ -1,10 +1,9 @@
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { getRolesByProduct } from "@/lib/internalApi/roles";
 import { createUser, updateUser } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
-import { Card, Checkbox, Form, Input, Modal, Select, Space } from "antd";
+import { Button, Card, Checkbox, Form, Input, Modal, Select, Space } from "antd";
 import React, { useEffect, useState } from "react";
 const { Meta } = Card;
 
@@ -23,21 +22,11 @@ const dummyUser = {
     "role": "SALES_STAFF",
 }
 
-function UserModal({ modalData, handleModalResponse }: any) {
+function UserModal({ modalData, handleModalResponse, rolesList }: any) {
     const [form] = Form.useForm();
     const dispatch = useAppDispatch();
-    const [rolesList, setRolesList] = useState<any[]>([]);
     const userData = useAppSelector(getAuthUserState);
-
-    useEffect(() => {
-        if (userData?.productId) {
-            getRolesByProduct(userData?.productId).then((res: any) => {
-                if (res.data) setRolesList(res.data)
-            }).catch(function (error: any) {
-                console.log(`/getRolesByProduct `, error);
-            });
-        }
-    }, [])
+    const [inActiveRoleDetails, setinActiveRoleDetails] = useState<any>(null)
 
     interface FieldData {
         name: string | number | (string | number)[];
@@ -58,7 +47,13 @@ function UserModal({ modalData, handleModalResponse }: any) {
         if (modalData.user) {
 
             let currentRole = modalData.user.userProductsList.find((r: any) => r.productId == userData.productId)
-            currentRole = currentRole?.roleId;
+            const roleDetails = rolesList.find((r: any) => r.id == currentRole?.roleId)
+            if (!(roleDetails?.active)) {
+                currentRole = null;
+                setinActiveRoleDetails(roleDetails)
+            } else {
+                currentRole = currentRole?.roleId;
+            }
             console.log(modalData.user)
             setFields([
                 { label: "Active", name: ["active"], value: modalData?.user?.active },
@@ -128,7 +123,8 @@ function UserModal({ modalData, handleModalResponse }: any) {
     }
 
     const getRolesOptions = () => {
-        return rolesList.filter((r: any) => r.roleName != "CEO" && r.active).map((r: any) => ({ value: r.id, label: r.roleName }))
+        const options: any = rolesList.filter((r: any) => r.active).map((r: any) => ({ value: r.id, label: r.roleName }));
+        return options
     }
 
     return (
@@ -161,23 +157,30 @@ function UserModal({ modalData, handleModalResponse }: any) {
                                         <Form.Item name={item.name} valuePropName="checked" noStyle>
                                             <Checkbox>{item.label}</Checkbox>
                                         </Form.Item> :
-                                        item.label == "Role" ? <Form.Item
-                                            label="Role"
-                                            name="roleId"
-                                            rules={[{ required: true, message: `Please select role` }]}
-                                        >
-                                            <Select
-                                                showSearch
-                                                style={{ width: 200 }}
-                                                placeholder="Search to Select"
-                                                optionFilterProp="children"
-                                                filterOption={(input, option) => (option?.label ?? '').includes(input)}
-                                                filterSort={(optionA, optionB) =>
-                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
-                                                }
-                                                options={getRolesOptions()}
-                                            />
-                                        </Form.Item> : <Form.Item
+                                        item.label == "Role" ? <>
+                                            <Space direction="vertical">
+                                                {Boolean(inActiveRoleDetails?.roleName) && <Button type="text" size="small" danger>
+                                                    Previously assigned role is {inActiveRoleDetails.roleName} and it is currently inactive
+                                                </Button>}
+                                                <Form.Item
+                                                    label="Role"
+                                                    name="roleId"
+                                                    rules={[{ required: true, message: `Please select role` }]}
+                                                >
+                                                    <Select
+                                                        showSearch
+                                                        style={{ width: 200 }}
+                                                        placeholder="Search to Select"
+                                                        optionFilterProp="children"
+                                                        filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
+                                                        filterSort={(optionA, optionB) =>
+                                                            (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                        }
+                                                        options={getRolesOptions()}
+                                                    />
+                                                </Form.Item>
+                                            </Space>
+                                        </> : <Form.Item
                                             label={item.label}
                                             name={item.name}
                                             rules={item.label == "Alternate Number" || item.label == "Designation" ? [] : [{ required: true, message: `Please enter your ${item.label}` }]}

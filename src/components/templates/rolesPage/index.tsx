@@ -50,14 +50,14 @@ function RolesPage() {
                 {rolesList.map((details: any) => {
                     return <Card
                         key={Math.random()}
-                        title={`${details.roleName} Role`}
+                        title={''}
                         style={{ width: 300 }}
                         actions={[
                             <Button onClick={() => setModalData({ active: true, role: details })} key={Math.random()} >View Details</Button>
                         ]}
                     >
                         <Space size={20} direction="vertical">
-                            <Meta description={details.description} />
+                            <Meta title={`${details.roleName}`} />
                             {/* <Space direction="vertical">
                                 <Meta title="Permissions Granted:" />
                                 {Object.keys(details?.rolePermissions || {}).map((permision: any) => {

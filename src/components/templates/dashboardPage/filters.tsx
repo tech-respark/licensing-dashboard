@@ -79,7 +79,7 @@ function Filters({ defaultFilters, hide = "", initialFilters, setInitialFilters 
                 />
             </Space>}
 
-            {Boolean(userData?.rolePermissions?.usersDashboard) && <Space direction='vertical'>
+            {Boolean(userData?.rolePermissions?.users) && <Space direction='vertical'>
                 <Text>Sales Persons</Text>
                 <Select
                     allowClear

@@ -3,6 +3,7 @@ import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
 import { createRole, updateRole } from "@/lib/internalApi/roles";
 import { getAuthUserState } from "@/redux/slices/auth";
+import { toggleLoader } from "@/redux/slices/loader";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
 import { Card, Checkbox, CheckboxOptionType, Form, Input, Modal, Space } from "antd";
 import React, { useCallback, useEffect, useState } from "react";
@@ -16,7 +17,7 @@ const dummyRole = {
     "rolePermissions": {
         "isApprover": 0,
         "dashboard": 1,
-        "requestsDashboard": 1,
+        "salesDashboard": 1,
         "clientsDashboard": 0,
         "reportsDashboard": 0,
         "usersDashboard": 1,
@@ -76,13 +77,13 @@ function RolesModal({ modalData, handleModalResponse }: any) {
         if (modalData.role) {
             setFields([
                 { label: "Role Name", name: ["roleName"], value: modalData?.role?.roleName },
-                { label: "Role Description", name: ["description"], value: modalData?.role?.description },
+                // { label: "Role Description", name: ["description"], value: modalData?.role?.description },
                 { label: "Active", name: ["active"], value: modalData?.role?.active },
             ])
         } else {
             setFields([
                 { label: "Role Name", name: ["roleName"], value: "" },
-                { label: "Role Description", name: ["description"], value: "" },
+                // { label: "Role Description", name: ["description"], value: "" },
                 { label: "Active", name: ["active"], value: true },
             ])
         }
@@ -122,10 +123,12 @@ function RolesModal({ modalData, handleModalResponse }: any) {
             details.createdByUserId = userData.id;
         }
         const api = modalData?.role?.id ? updateRole : createRole;
+        dispatch(toggleLoader(true))
         api(details).then((res: any) => {
             dispatch(showSuccessToast("Role created successfully."))
             details.rolePermissions.id = res?.data.rolePermissions.id;
             handleModalResponse({ ...details, id: res?.data?.id })
+            dispatch(toggleLoader(false))
             form.resetFields();
         })
             .catch((error: any) => {
