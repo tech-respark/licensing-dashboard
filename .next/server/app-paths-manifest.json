@@ -1,7 +1,9 @@
 {
-  "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
   "/(withLayout)/sales/page": "app/(withLayout)/sales/page.js",
-  "/(withLayout)/requestDetails/[requestId]/page": "app/(withLayout)/requestDetails/[requestId]/page.js",
-  "/(withLayout)/users/page": "app/(withLayout)/users/page.js",
-  "/page": "app/page.js"
+  "/(withLayout)/modules/page": "app/(withLayout)/modules/page.js",
+  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
+  "/page": "app/page.js",
+  "/(withoutLyaout)/login/page": "app/(withoutLyaout)/login/page.js",
+  "/(withoutLyaout)/resetPassword/page": "app/(withoutLyaout)/resetPassword/page.js",
+  "/(withoutLyaout)/resetPassword/[userId]/page": "app/(withoutLyaout)/resetPassword/[userId]/page.js"
 }

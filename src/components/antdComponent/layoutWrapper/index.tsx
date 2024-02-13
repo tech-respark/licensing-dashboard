@@ -10,7 +10,7 @@ import { getDarkModeState } from '@/redux/slices/clientThemeConfig';
 import { StyleProvider, createCache } from '@ant-design/cssinjs';
 import type Entity from '@ant-design/cssinjs/es/Cache';
 import { Layout, theme } from 'antd';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import React, { Fragment, useEffect, useState } from 'react';
 import Styles from './layoutWrapper.module.scss';
 const { Content } = Layout;
@@ -23,10 +23,13 @@ export default function AntdLayoutWrapper(props: any) {
     const dispatch = useAppDispatch()
     const { token } = theme.useToken();
     const userData = useAppSelector(getAuthUserState);
+    const pathname = usePathname()
 
     useEffect(() => {
         if (!userData) {
-            return router.push("/login")
+            if (!pathname.includes(("resetPassword"))) {
+                return router.push("/login")
+            }
         }
     }, [userData])
 

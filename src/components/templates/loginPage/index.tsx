@@ -167,6 +167,9 @@ function LoginPage() {
                         <Button type="primary" htmlType="submit">
                             Submit
                         </Button>
+                        <Button type="link" onClick={() => router.push("/resetPassword")}>
+                            Forgot Password
+                        </Button>
                     </Form.Item>
                 </Form>
             </div>

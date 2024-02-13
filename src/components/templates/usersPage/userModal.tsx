@@ -5,7 +5,7 @@ import { createUser, updateUser } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
 import { Card, Checkbox, Form, Input, Modal, Select, Space } from "antd";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 const { Meta } = Card;
 
 const dummyUser = {
@@ -48,36 +48,6 @@ function UserModal({ modalData, handleModalResponse }: any) {
         label?: string;
     }
 
-    const permissionsList = [
-        { key: "dashboard", value: true, title: "Dashboard" },
-        { key: "requestsDashboard", value: false, title: "Requests Dashboard" },
-        { key: "clientsDashboard", value: false, title: "Clients Dashboard" },
-        { key: "reportsDashboard", value: true, title: "Reports Dashboard" },
-        { key: "usersDashboard", value: true, title: "Users Dashboard" },
-    ]
-
-    const defaultCheckedList = useCallback(
-        () => {
-            if (Boolean(modalData?.user?.userPermissionsList)) {
-                const permissions: any = []
-                permissionsList.map((permission: any) => {
-                    if (modalData?.user?.userPermissionsList[permission.key]) permissions.push(permission.key)
-                })
-                return permissions;
-            } else {
-                return []
-            }
-        },
-        [modalData],
-    )
-
-    const [checkedList, setCheckedList] = useState<any>(defaultCheckedList());
-
-    const options = permissionsList.map(({ key, title }: any) => ({
-        label: title,
-        value: key,
-    }));
-
     const handleCancel = () => {
         handleModalResponse();
     };
@@ -86,6 +56,9 @@ function UserModal({ modalData, handleModalResponse }: any) {
 
     useEffect(() => {
         if (modalData.user) {
+
+            let currentRole = modalData.user.userProductsList.find((r: any) => r.productId == userData.productId)
+            currentRole = currentRole?.roleId;
             console.log(modalData.user)
             setFields([
                 { label: "Active", name: ["active"], value: modalData?.user?.active },
@@ -93,7 +66,7 @@ function UserModal({ modalData, handleModalResponse }: any) {
                 { label: "Phone Number", name: ["phoneNumber"], value: modalData?.user?.phoneNumber },
                 { label: "Email", name: ["email"], value: modalData?.user?.email },
                 { label: "Password", name: ["password"], value: modalData?.user?.password },
-                { label: "Role", name: ["roleId"], value: modalData?.user?.roleId },
+                { label: "Role", name: ["roleId"], value: currentRole },
                 { label: "Alternate Number", name: ["altPhoneNumber"], value: modalData?.user?.altPhoneNumber },
                 { label: "Designation", name: ["designation"], value: modalData?.user?.designation },
             ])
@@ -111,14 +84,6 @@ function UserModal({ modalData, handleModalResponse }: any) {
         }
     }, [modalData])
 
-    const getPermissions = () => {
-        const permissionsListCopy: any = { productId: userData?.productId };
-        permissionsList.map((p: any) => {
-            permissionsListCopy[p.key] = checkedList.includes(p.key) ? 1 : 0
-        })
-        return permissionsListCopy;
-    }
-
     const onCreate = (values: any) => {
 
         const details = {
@@ -127,15 +92,29 @@ function UserModal({ modalData, handleModalResponse }: any) {
             "gender": "MALE",
             // "userPermissionsList": [getPermissions()],
         }
-        console.log("final details", details)
         if (modalData?.user?.id) {
             details.id = modalData?.user?.id;
             details.modifiedBy = userData.name;
             details.modifiedByUserId = userData.id;
+            let currentRoleIndex = modalData.user.userProductsList.findIndex((r: any) => r.productId == userData.productId)
+            if (modalData.user.userProductsList[currentRoleIndex].roleId != details.roleId) {
+                const roleDetails = rolesList.find((r: any) => details.roleId == r.id);
+                details.userProductsList = modalData.user.userProductsList;
+                details.userProductsList[currentRoleIndex].roleId = details.roleId;
+                details.userProductsList[currentRoleIndex].roleName = roleDetails.roleName;
+            }
         } else {
             details.createdBy = userData.name;
             details.createdByUserId = userData.id;
+            const roleDetails = rolesList.find((r: any) => details.roleId == r.id);
+            details.userProductsList = [{
+                "productId": userData.productId,
+                "roleId": details.roleId,
+                "roleName": roleDetails.roleName,
+                "active": true,
+            }]
         }
+        console.log("final details", details)
         const api = modalData?.user?.id ? updateUser : createUser;
         api(details).then((res: any) => {
             dispatch(showSuccessToast("User created successfully."))

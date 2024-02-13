@@ -16,7 +16,7 @@ function NotFound() {
             </div>
             <div className={styles.hWrap}>
                 <h1>404</h1>
-                <div className={styles.after}>404</div>
+                {/* <div className={styles.after}>404</div> */}
             </div>
             <div className={styles.cloak__wrapper}>
                 <div className={styles.cloak__container}>

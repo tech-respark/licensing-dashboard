@@ -76,7 +76,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                 const storeDetails: any = { ...store }
 
                 storeDetails.modulesList = [];
-                modulesList.map((module: any) => {
+                (modulesList.filter((param: any) => param.active)).map((module: any) => {
                     const moduleDetails = removeObjRef(module);
                     if (store?.modulesList?.find((m: any) => m.moduleId == moduleDetails.id)?.id) {
                         moduleDetails.selected = true;
