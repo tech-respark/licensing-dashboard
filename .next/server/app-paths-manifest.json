@@ -1,8 +1,7 @@
 {
-  "/(withLayout)/sales/page": "app/(withLayout)/sales/page.js",
-  "/(withLayout)/roles/page": "app/(withLayout)/roles/page.js",
   "/(withLayout)/users/page": "app/(withLayout)/users/page.js",
-  "/(withLayout)/modules/page": "app/(withLayout)/modules/page.js",
+  "/(withLayout)/roles/page": "app/(withLayout)/roles/page.js",
   "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
-  "/(withLayout)/clients/page": "app/(withLayout)/clients/page.js"
+  "/(withLayout)/clients/page": "app/(withLayout)/clients/page.js",
+  "/(withoutLyaout)/login/page": "app/(withoutLyaout)/login/page.js"
 }

@@ -70,22 +70,26 @@ function LoginPage() {
             .then((response: any) => {
                 // setProductSelectionModal({ active: true, userData: response.data })
                 dispatch(toggleLoader(false))
-
-                if (response.data?.userProductsList.length > 1) {
-                    setProductSelectionModal({ active: true, userData: response.data })
-                } else {
-                    response.data.productId = response.data.userProductsList[0].productId;
-                    response.data.roleName = response.data.userProductsList[0].roleName || response.data.roleName;
-                    response.data.rolePermissions = response.data.userProductsList[0].rolePermissions || response.data.rolePermissions;
-                    dispatch(setAuthUser(response.data))
-                    dispatch(showSuccessToast("Perfect! You're signed in successfully."))
-                    if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
-                        router.push("/")
+                if (response.data?.userProductsList) {
+                    if (response.data?.userProductsList.length > 1) {
+                        setProductSelectionModal({ active: true, userData: response.data })
                     } else {
-                        router.push("/sales")
+                        response.data.productId = response.data.userProductsList[0].productId;
+                        response.data.roleName = response.data.userProductsList[0].roleName || response.data.roleName;
+                        response.data.rolePermissions = response.data.userProductsList[0].rolePermissions || response.data.rolePermissions;
+                        dispatch(setAuthUser(response.data))
+                        dispatch(showSuccessToast("Perfect! You're signed in successfully."))
+                        if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
+                            router.push("/")
+                        } else {
+                            router.push("/sales")
+                        }
+                        dispatch(toggleLoader(false))
                     }
-                    dispatch(toggleLoader(false))
+                } else {
+                    dispatch(showErrorToast("Product not assigned to this user"))
                 }
+
             })
             .catch((err) => {
                 dispatch(toggleLoader(false))

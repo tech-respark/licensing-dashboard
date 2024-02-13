@@ -18,7 +18,10 @@ function UsersPage() {
     useEffect(() => {
         if (userData?.productId) {
             getUsersByProduct(userData?.productId).then((res: any) => {
-                if (res.data) setUsersList(res.data)
+                if (res.data) {
+                    debugger
+                    setUsersList(res.data)
+                }
             }).catch(function (error: any) {
                 console.log(`/getUsersByProduct `, error);
             });

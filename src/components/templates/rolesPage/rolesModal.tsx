@@ -190,7 +190,7 @@ function RolesModal({ modalData, handleModalResponse }: any) {
                 <Card style={{ width: "100%" }}>
                     <Space direction="vertical">
                         <Space direction='vertical' size={20}>
-                            <Meta title="Role Permissions" />
+                            <Meta title="System Permissions" />
                             <Checkbox.Group
                                 style={{
                                     display: "flex",

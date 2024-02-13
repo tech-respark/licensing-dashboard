@@ -45,11 +45,12 @@ export const PRODUCTS_LIST = [
 ]
 
 export const permissionsList = [
-    // { key: "masterDashboard", value: true, title: "Dashboard" },
+    { key: "masterDashboard", value: true, title: "Dashboard" },
     { key: "salesDashboard", value: false, title: "Sales" },
     { key: "clients", value: false, title: "Clients" },
-    // { key: "reports", value: true, title: "Reports" },
-    // { key: "usersDashboard", value: true, title: "Users Dashboard" },
+    { key: "modules", value: true, title: "Modules" },
+    { key: "users", value: true, title: "Users" },
+    { key: "roles", value: true, title: "Roles" },
 ]
 
 export const getDurationOptions = () => [

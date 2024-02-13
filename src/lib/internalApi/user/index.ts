@@ -30,7 +30,7 @@ export const getUsersByProduct = (productId: any) => {
         axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/usersByProductId?productId=${productId}`)
             .then((response: any) => {
                 if (response.data) {
-                    response.data.map((user: any) => {
+                    response.data.data.map((user: any) => {
                         user.roleName = user.userProductsList.find((r: any) => r.productId == productId).roleName;
                         user.roleId = user.userProductsList.find((r: any) => r.productId == productId).roleId;
                     })

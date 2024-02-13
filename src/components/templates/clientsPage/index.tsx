@@ -55,7 +55,7 @@ function ClientsPage() {
         dispatch(toggleLoader(true))
         getClientsByProduct({
             ...filters,
-            userId: Boolean(userData?.rolePermissions?.clientsDashboard) ? filters.userId : userData?.id,
+            userId: Boolean(userData?.rolePermissions?.clients) ? filters.userId : userData?.id,
             fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
             toDate: dayjs(filters.toDate).format(DATE_FORMAT)
         }).then((res: any) => {

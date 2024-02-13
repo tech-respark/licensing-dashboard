@@ -1,5 +1,5 @@
 'use client'
-import { ADMIN_ROLE, CEO_ROLE, LOGO_IMAGE } from '@/constants/common';
+import { LOGO_IMAGE } from '@/constants/common';
 import NavigationMenus from '@/constants/navigation';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { getAuthUserState } from '@/redux/slices/auth';
@@ -21,9 +21,14 @@ function SidebarComponent({ collapsed, setCollapsed }: any) {
     useEffect(() => {
         const NAV_COPY = [...NavigationMenus];
         NAV_COPY.map((nav: any) => {
-            if ((nav.name == "Dashboard" || nav.name == "Role" || nav.name == "Modules" || nav.name == "Users") && !(userData?.roleName == CEO_ROLE || userData?.roleName == ADMIN_ROLE)) nav.active = false;
+            // if ((nav.name == "Dashboard") && !(userData?.roleName == CEO_ROLE || userData?.roleName == ADMIN_ROLE)) nav.active = false;
+            // if (nav.name == "Sales Dashboard" && !Boolean(userData?.rolePermissions?.salesDashboard)) nav.active = false;
+            // if (nav.name == "Clients" && !Boolean(userData?.rolePermissions?.clients)) nav.active = false;
+            if (nav.name == "Dashboard" && !Boolean(userData?.rolePermissions?.masterDashboard)) nav.active = false;
+            if (nav.name == "Modules" && !Boolean(userData?.rolePermissions?.modules)) nav.active = false;
+            if (nav.name == "Users" && !Boolean(userData?.rolePermissions?.users)) nav.active = false;
+            if (nav.name == "Role" && !Boolean(userData?.rolePermissions?.roles)) nav.active = false;
             else nav.active = true;
-            if (nav.name == "Reports" && !Boolean(userData?.rolePermissions?.reportsDashboard)) nav.active = false;
         })
         setNavigations(NAV_COPY.filter((n: any) => n.active).map((navItem: any) => getItem(navItem.name, navItem.route, <navItem.icon />)));
     }, [])
