@@ -19,7 +19,6 @@ function UsersPage() {
         if (userData?.productId) {
             getUsersByProduct(userData?.productId).then((res: any) => {
                 if (res.data) {
-                    debugger
                     setUsersList(res.data)
                 }
             }).catch(function (error: any) {

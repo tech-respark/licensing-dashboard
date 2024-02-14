@@ -1,5 +1,5 @@
 // import { REQUEST_STATUSES } from '@/constants/common'
-import { DATE_FORMAT, REQUEST_STATUS_COLORS_LIST } from '@/constants/common';
+import { ADMIN_ROLE, DATE_FORMAT, REQUEST_STATUS_COLORS_LIST, SUPPORT_ROLE } from '@/constants/common';
 import { useAppDispatch } from '@/hooks/useAppDispatch';
 import { useAppSelector } from '@/hooks/useAppSelector';
 import { updateRequestStatus } from '@/lib/internalApi/requests';
@@ -65,6 +65,7 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
     const currentRole = userData?.roleName;
     const dispatch = useAppDispatch()
     const [actionsList, setActionsList] = useState([...inititalActions])
+    const [paymentRecieved, setPaymentRecieved] = useState('')
 
     const getActions = () => {
         let actions = [...inititalActions];
@@ -163,13 +164,15 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
         }
     }
 
-    const updateRequest = (newStatus: any) => {
+    const updateRequest = (newStatus: any, paymentDetails: any = null) => {
 
         dispatch(toggleLoader(true))
-        updateRequestStatus({
-            id: requestDetails.id,
-            updatedStatus: newStatus
-        }).then((res: any) => {
+        if (!Boolean(newStatus) && !Boolean(paymentDetails)) return;
+        const body: any = { id: requestDetails.id }
+        if (newStatus) body.updatedStatus = newStatus;
+        if (paymentDetails) body.updatedPayment = paymentDetails;
+
+        updateRequestStatus(body).then((res: any) => {
             dispatch(showSuccessToast("Request updated successfully."))
             updateNewStatus(res.data.statusesList[res.data.statusesList.length - 1]);
             setRemarkPopup({ active: false, remark: "" })
@@ -185,22 +188,41 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
     }
 
     const onSubmitAction = (action: any) => {
+
         console.log("onSubmitAction", action)
         let price = 0;
         let discountPercentage = 0;
+        let newStatus: any = null;
+        let paymentDetails: any = null;
+
         if (Boolean(negotiationStatus) && (action == REQUEST_STATUSES.APPROVED_BY_ADMIN || action == REQUEST_STATUSES.APPROVED_BY_CEO)) {
             price = negotiationStatus.price;
             discountPercentage = ((Number(requestDetails.sellingPrice) - Number(negotiationStatus.price)) / Number(requestDetails.sellingPrice)) * 100;
         }
-        const newStatus = {
-            "status": action,
-            "createdBy": userData.name,
-            "createdByUserId": userData.id,
-            "price": price,
-            "discountPercentage": discountPercentage,
-            "remark": ""
+        if (action == "Payment") {
+            if (!Boolean(paymentRecieved)) {
+                dispatch(showErrorToast("Enter amount"))
+            }
+        } else {
+            newStatus = {
+                "status": action,
+                "createdBy": userData.name,
+                "createdByUserId": userData.id,
+                "price": price,
+                "discountPercentage": discountPercentage,
+                "remark": ""
+            }
         }
-        updateRequest(newStatus)
+
+        if (Boolean(paymentRecieved)) {
+            paymentDetails = {
+                "createdBy": userData.name,
+                "createdByUserId": userData.id,
+                "paymentMode": "",
+                "paymentValue": Number(paymentRecieved)
+            }
+        }
+        updateRequest(newStatus, paymentDetails)
     }
 
 
@@ -225,7 +247,7 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
                             {inititatedStatus.createdBy} ({dayjs(inititatedStatus.createdOn).format(DATE_FORMAT)})
                             and it is in {currentStatus.status} ({dayjs(inititatedStatus.createdOn).format(DATE_FORMAT)}) state.</>
                         <br />
-                        {Boolean(negotiationStatus) && <>Negotiation price is: {negotiationStatus?.price}</>}.&nbsp;
+                        {Boolean(negotiationStatus) && <>Negotiation price is: {negotiationStatus?.price}.</>}&nbsp;
                         {Boolean(negotiationStatus) && Boolean(negotiationStatus?.remark) && <>Negotiation remark is: {negotiationStatus?.remark}</>}
                         {Boolean(rejectionStatus) && <>Request rejected due to {rejectionStatus?.remark}</>}
                     </Tag>
@@ -235,6 +257,10 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
         )
     }
 
+    const onChangePrice = (value: any) => {
+        if (Number(value) > Number(requestDetails.pendingAmount)) return;
+        setPaymentRecieved(value)
+    }
 
     return (
         <>
@@ -242,6 +268,10 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
                 <Space>
                     {getRequestDetailsTagline(requestDetails)}
                 </Space>
+                {Boolean(requestDetails?.pendingAmount) && (currentStatus.status == REQUEST_STATUSES.APPROVED_BY_ADMIN || currentStatus.status == REQUEST_STATUSES.APPROVED_BY_CEO || currentStatus.status == REQUEST_STATUSES.ONBOARDED) && (currentRole == ADMIN_ROLE || currentRole == SUPPORT_ROLE) && <Space>
+                    <Text>Current Pending Amount: {requestDetails?.pendingAmount}&nbsp;&nbsp;|&nbsp; Add payment: </Text>
+                    <Input value={paymentRecieved} onChange={(e) => onChangePrice(e.target.value)} placeholder="Enter payment recieved" />
+                </Space>}
                 <Space>
                     {CancelBtn}
                     {extraActions}
@@ -333,6 +363,18 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
                             </>}
                         </Fragment>
                     })}
+                    {Boolean(requestDetails?.pendingAmount) && (currentStatus.status == REQUEST_STATUSES.APPROVED_BY_ADMIN || currentStatus.status == REQUEST_STATUSES.APPROVED_BY_CEO || currentStatus.status == REQUEST_STATUSES.ONBOARDED) && (currentRole == ADMIN_ROLE || currentRole == SUPPORT_ROLE) && <>
+                        <Popconfirm
+                            icon={<></>}
+                            title={`Update request payments`}
+                            description={`Are you sure you want to update payments for this request?`}
+                            onConfirm={() => onSubmitAction("Payment")}
+                            okText="Yes Sure"
+                            cancelText="Cancel"
+                        >
+                            <Button type="primary">Update Payment</Button>
+                        </Popconfirm>
+                    </>}
                 </Space>
             </Space>
         </>

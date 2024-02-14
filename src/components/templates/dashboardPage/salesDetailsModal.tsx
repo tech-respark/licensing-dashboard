@@ -114,6 +114,20 @@ function SalesDetailsModal({ isModalOpen, setIsModalOpen, salesDetails, handleMo
                             <Descriptions.Item label="Discount">{requestDetails.discountPercentage || 0} %</Descriptions.Item>
                             <Descriptions.Item label="Selling Price">{requestDetails.sellingPrice || 0}</Descriptions.Item>
                         </Descriptions>
+
+                        <Divider style={{ margin: 10 }} />
+                        {Boolean(requestDetails?.paymentsList?.length) && <Descriptions column={1} title={`Payment History - ${requestDetails.pendingAmount ? "Pending" : "Paid"}`}>
+                            {requestDetails.paymentsList.map((paymentDetails: any, si: number) => {
+                                return <Space key={si}>
+                                    <Descriptions column={3}>
+                                        <Descriptions.Item label="Payment">{paymentDetails.paymentValue}</Descriptions.Item>
+                                        <Descriptions.Item label="Updated By">{paymentDetails.createdBy}</Descriptions.Item>
+                                        <Descriptions.Item label="Paid On">{dayjs(paymentDetails.createdOn).format(DATE_FORMAT)}</Descriptions.Item>
+                                        {Boolean(paymentDetails.remark) && <Descriptions.Item label="Remark">{paymentDetails.remark}</Descriptions.Item>}
+                                    </Descriptions>
+                                </Space>
+                            })}
+                        </Descriptions>}
                     </Card>
                 </Space>
             </Modal>
