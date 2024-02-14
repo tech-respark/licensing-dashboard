@@ -38,6 +38,11 @@ export const TABLE_COLUMNS = () => [
         key: 'invoiceNumber'
     },
     {
+        title: 'Pending Amount',
+        dataIndex: 'pendingAmount',
+        key: 'pendingAmount',
+    },
+    {
         title: 'Status',
         dataIndex: 'currentStatus',
         key: 'currentStatus',

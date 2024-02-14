@@ -63,8 +63,8 @@
     "/(withLayout)/dashboard/page": [
       "static/chunks/webpack.js",
       "static/chunks/main-app.js",
-      "static/chunks/app/(withLayout)/dashboard/page.js",
-      "static/css/app/(withLayout)/dashboard/page.css"
+      "static/css/app/(withLayout)/dashboard/page.css",
+      "static/chunks/app/(withLayout)/dashboard/page.js"
     ]
   }
 }
