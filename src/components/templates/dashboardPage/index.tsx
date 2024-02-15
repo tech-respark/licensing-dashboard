@@ -37,7 +37,13 @@ function DashboardPage() {
     const [modulesList, setModulesList] = useState<any[]>([]);
     const [usersList, setUsersList] = useState<any[]>([]);
     const dispatch = useAppDispatch();
-
+    const [paginationProps, setPaginationProps] = useState({
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true,
+        pageSizeOptions: ['10', '20', '30', '40', '50'],
+        current: 1
+    })
     const defaultFilters = {
         "filters": [],
         "productId": userData?.productId,
@@ -108,6 +114,7 @@ function DashboardPage() {
             }
         ).then((res: any) => {
             if (res.data) {
+                setPaginationProps({ ...paginationProps, total: res.totalNumberOfRecords })
                 setSalesRequestsList(res.data)
                 dispatch(toggleLoader(false))
             } else {
@@ -127,8 +134,13 @@ function DashboardPage() {
     }
 
     const handleChange: OnChange = (pagination: any) => {
+        setPaginationProps({ ...paginationProps, pageSize: pagination.pageSize, current: pagination.current })
+        setFilters({ ...filters, pageNumber: pagination.current, recordsPerPage: pagination.pageSize })
+        if (pagination.pageSize != filters.recordsPerPage) {//reset if number of records per page changed
+            setFilters({ ...filters, pageNumber: 1, recordsPerPage: pagination.pageSize })
+            setPaginationProps({ ...paginationProps, pageSize: pagination.pageSize, current: 1 })
+        }
         console.log('Various parameters', pagination);
-        setFilters({ ...filters, pageNumber: pagination.current })
     };
 
     const defaultCheckedList = TABLE_COLUMNS().map((item) => item.key as string);
@@ -200,7 +212,7 @@ function DashboardPage() {
                         }}
                         bordered
                         rowKey={(record) => record.key}
-                        pagination={{ pageSize: 10 }}
+                        pagination={{ ...paginationProps, showSizeChanger: paginationProps.total > 10 }}
                         // scroll={{ x: 1500, y: 500 }}
                         columns={newColumns}
                         dataSource={salesRequestsList}

@@ -14,8 +14,8 @@ export interface DataType {
 export const TABLE_COLUMNS = () => [
     {
         title: 'Business Name',
-        dataIndex: 'tenantName',
-        key: 'tenantName',
+        dataIndex: 'tenantBusinessName',
+        key: 'tenantBusinessName',
     },
     {
         title: 'Sales Person',

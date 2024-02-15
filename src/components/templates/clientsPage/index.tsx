@@ -33,7 +33,13 @@ function ClientsPage() {
     const [clientsList, setClientsList] = useState<any[]>([]);
     const userData = useAppSelector(getAuthUserState);
     const dispatch = useAppDispatch()
-
+    const [paginationProps, setPaginationProps] = useState({
+        pageSize: 10,
+        total: 0,
+        showSizeChanger: true,
+        pageSizeOptions: ['10', '20', '30', '40', '50'],
+        current: 1
+    })
     const defaultFilters = {
         "filters": [],
         "productId": userData?.productId,
@@ -61,6 +67,7 @@ function ClientsPage() {
         }).then((res: any) => {
             dispatch(toggleLoader(false))
             if (res.data) {
+                setPaginationProps({ ...paginationProps, total: res.totalNumberOfRecords })
                 setClientsList(res.data)
             } else setClientsList([])
         })
@@ -76,8 +83,13 @@ function ClientsPage() {
     }
 
     const handleChange: OnChange = (pagination: any) => {
+        setPaginationProps({ ...paginationProps, pageSize: pagination.pageSize, current: pagination.current })
+        setFilters({ ...filters, pageNumber: pagination.current, recordsPerPage: pagination.pageSize })
+        if (pagination.pageSize != filters.recordsPerPage) {//reset if number of records per page changed
+            setFilters({ ...filters, pageNumber: 1, recordsPerPage: pagination.pageSize })
+            setPaginationProps({ ...paginationProps, pageSize: pagination.pageSize, current: 1 })
+        }
         console.log('Various parameters', pagination);
-        setFilters({ ...filters, pageNumber: pagination.current })
     };
 
     const data: DataType[] = [...clientsList];
@@ -105,7 +117,7 @@ function ClientsPage() {
                         }}
                         rowKey={(record) => record.id}
                         bordered
-                        pagination={{ pageSize: 10 }}
+                        pagination={{ ...paginationProps, showSizeChanger: paginationProps.total > 10 }}
                         // scroll={{ x: 1500, y: 500 }}
                         columns={TABLE_COLUMNS()}
                         dataSource={data}

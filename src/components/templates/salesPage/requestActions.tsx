@@ -287,7 +287,7 @@ function RequestActions({ extraActions, CancelBtn, handleModalResponse, requestD
                                     description={<>
                                         <Space direction="vertical">
                                             <Space direction="vertical">
-                                                <Text>Please Enter reason for rejection:</Text>
+                                                <Text>Please enter reason for rejection:</Text>
                                                 <Input
                                                     status={error.id == "rejectionRemark" ? "error" : ""}
                                                     value={remarkPopup.remark}
