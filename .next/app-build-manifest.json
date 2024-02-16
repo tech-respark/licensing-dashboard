@@ -35,6 +35,36 @@
       "static/chunks/main-app.js",
       "static/css/app/(withLayout)/clients/page.css",
       "static/chunks/app/(withLayout)/clients/page.js"
+    ],
+    "/(withoutLyaout)/layout": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withoutLyaout)/layout.css",
+      "static/chunks/app/(withoutLyaout)/layout.js"
+    ],
+    "/(withoutLyaout)/login/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withoutLyaout)/login/page.css",
+      "static/chunks/app/(withoutLyaout)/login/page.js"
+    ],
+    "/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/page.css",
+      "static/chunks/app/page.js"
+    ],
+    "/(withLayout)/users/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withLayout)/users/page.css",
+      "static/chunks/app/(withLayout)/users/page.js"
+    ],
+    "/(withLayout)/roles/page": [
+      "static/chunks/webpack.js",
+      "static/chunks/main-app.js",
+      "static/css/app/(withLayout)/roles/page.css",
+      "static/chunks/app/(withLayout)/roles/page.js"
     ]
   }
 }

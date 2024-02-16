@@ -60,7 +60,7 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                 { label: "Name", name: ["name"], value: modalData?.user?.name },
                 { label: "Phone Number", name: ["phoneNumber"], value: modalData?.user?.phoneNumber },
                 { label: "Email", name: ["email"], value: modalData?.user?.email },
-                { label: "Password", name: ["password"], value: modalData?.user?.password },
+                // { label: "Password", name: ["password"], value: modalData?.user?.password },
                 { label: "Role", name: ["roleId"], value: currentRole },
                 { label: "Alternate Number", name: ["altPhoneNumber"], value: modalData?.user?.altPhoneNumber },
                 { label: "Designation", name: ["designation"], value: modalData?.user?.designation },

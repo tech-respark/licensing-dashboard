@@ -13,6 +13,11 @@ export interface DataType {
 
 export const TABLE_COLUMNS = () => [
     {
+        title: 'Invoice',
+        dataIndex: 'invoiceNumber',
+        key: 'invoiceNumber'
+    },
+    {
         title: 'Business Name',
         dataIndex: 'tenantBusinessName',
         key: 'tenantBusinessName',
@@ -32,11 +37,7 @@ export const TABLE_COLUMNS = () => [
         dataIndex: 'expiryDate',
         key: 'expiryDate'
     },
-    {
-        title: 'Invoice',
-        dataIndex: 'invoiceNumber',
-        key: 'invoiceNumber'
-    },
+
     {
         title: 'Pending Amount',
         dataIndex: 'pendingAmount',

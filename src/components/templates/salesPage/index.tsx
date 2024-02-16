@@ -68,6 +68,7 @@ function SalesPage() {
     const [usersList, setUsersList] = useState<any[]>([]);
     const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
     const dispatch = useAppDispatch()
+    console.log(userData)
     const [paginationProps, setPaginationProps] = useState({
         pageSize: 10,
         total: 0,
@@ -212,7 +213,12 @@ function SalesPage() {
                         bordered
                         pagination={{ ...paginationProps, showSizeChanger: paginationProps.total > 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={TABLE_COLUMNS().filter((c: any) => (c.key !== "expiryDate") && (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.salesDashboard) : true))}
+                        columns={TABLE_COLUMNS().filter((c: any) =>
+                            (c.key !== "expiryDate") &&
+                            (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.salesDashboard) : true) &&
+                            (c.key == "sellingPrice" && userData.roleName !== SALES_PERSON_ROLE) &&
+                            (c.key == "pendingAmount" && userData.roleName !== SALES_PERSON_ROLE)
+                        )}
                         dataSource={data}
                         onChange={handleChange}
                     />
