@@ -20,6 +20,10 @@ export const getActionsAfterApprovedByAdmin = (currentRole: string) => {
                     case "Reject":
                         action.active = false;
                         break;
+                    case "Onboarded":
+                        action.active = true;
+                        action.action = REQUEST_STATUSES.ONBOARDED;
+                        break;
                 }
             })
             break;

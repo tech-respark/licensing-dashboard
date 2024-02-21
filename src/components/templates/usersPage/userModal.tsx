@@ -61,10 +61,11 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
             const productWiseUserCopy = [...productWiseUser];
             productWiseUserCopy.map((p: any) => {
                 let currentRole = modalData.user.userProductsList.find((r: any) => r.productId == p.productId);
-                if (currentRole) {
-                    const roleDetails = rolesList.find((r: any) => r.id == currentRole?.roleId)
+                const roleDetails = rolesList.find((r: any) => r.id == currentRole?.roleId)
+                if (currentRole && Boolean(roleDetails)) {
                     p.roleId = roleDetails.id;
                     p.roleName = roleDetails.roleName;
+                    p.active = currentRole.active;
                 }
             })
             setProductWiseUser(productWiseUserCopy);
@@ -85,7 +86,7 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                 { label: "Name", name: ["name"], value: "" },
                 { label: "Phone Number", name: ["phoneNumber"], value: "" },
                 { label: "Email", name: ["email"], value: "" },
-                // { label: "Password", name: ["password"], value: "" },
+                { label: "Password", name: ["password"], value: "" },
                 // { label: "Role", name: ["roleId"], value: "" },
                 { label: "Alternate Number", name: ["altPhoneNumber"], value: "" },
                 { label: "Designation", name: ["designation"], value: "" },
@@ -253,7 +254,7 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                                             />
                                         </Space>
                                         <Space>
-                                            <Checkbox defaultChecked={product.active} checked={product.active} onChange={() => {
+                                            <Checkbox defaultChecked={Boolean(product.active)} checked={Boolean(product.active)} onChange={() => {
                                                 const productWiseUserCopy = [...productWiseUser];
                                                 productWiseUserCopy[i].active = !productWiseUserCopy[i].active;
                                                 setProductWiseUser(productWiseUserCopy);

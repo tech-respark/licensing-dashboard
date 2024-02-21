@@ -71,21 +71,21 @@ function LoginPage() {
                 // setProductSelectionModal({ active: true, userData: response.data })
                 dispatch(toggleLoader(false))
                 if (response.data?.userProductsList) {
-                    if (response.data?.userProductsList.length > 1) {
-                        setProductSelectionModal({ active: true, userData: response.data })
+                    // if (response.data?.userProductsList.length > 1) {
+                    //     setProductSelectionModal({ active: true, userData: response.data })
+                    // } else {
+                    response.data.productId = response.data.userProductsList[0].productId;
+                    response.data.roleName = response.data.userProductsList[0].roleName || response.data.roleName;
+                    response.data.rolePermissions = response.data.userProductsList[0].rolePermissions || response.data.rolePermissions;
+                    dispatch(setAuthUser(response.data))
+                    dispatch(showSuccessToast("Perfect! You're signed in successfully."))
+                    if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
+                        router.push("/")
                     } else {
-                        response.data.productId = response.data.userProductsList[0].productId;
-                        response.data.roleName = response.data.userProductsList[0].roleName || response.data.roleName;
-                        response.data.rolePermissions = response.data.userProductsList[0].rolePermissions || response.data.rolePermissions;
-                        dispatch(setAuthUser(response.data))
-                        dispatch(showSuccessToast("Perfect! You're signed in successfully."))
-                        if (response.data.roleName == CEO_ROLE || response.data.roleName == ADMIN_ROLE) {
-                            router.push("/")
-                        } else {
-                            router.push("/sales")
-                        }
-                        dispatch(toggleLoader(false))
+                        router.push("/sales")
                     }
+                    dispatch(toggleLoader(false))
+                    // }
                 } else {
                     dispatch(showErrorToast("Product not assigned to this user"))
                 }

@@ -23,9 +23,9 @@ export const TABLE_COLUMNS = () => [
         key: 'tenantBusinessName',
     },
     {
-        title: 'Sales Person',
-        dataIndex: 'salesPersonName',
-        key: 'salesPersonName'
+        title: 'Store Name',
+        dataIndex: 'storeName',
+        key: 'storeName',
     },
     {
         title: 'Selling Price',
@@ -42,6 +42,11 @@ export const TABLE_COLUMNS = () => [
         title: 'Pending Amount',
         dataIndex: 'pendingAmount',
         key: 'pendingAmount',
+    },
+    {
+        title: 'Sales Person',
+        dataIndex: 'salesPersonName',
+        key: 'salesPersonName'
     },
     {
         title: 'Status',

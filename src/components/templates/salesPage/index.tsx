@@ -213,12 +213,17 @@ function SalesPage() {
                         bordered
                         pagination={{ ...paginationProps, showSizeChanger: paginationProps.total > 10 }}
                         // scroll={{ x: 1500, y: 500 }}
-                        columns={TABLE_COLUMNS().filter((c: any) =>
-                            (c.key !== "expiryDate") &&
-                            (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.salesDashboard) : true) &&
-                            (c.key == "sellingPrice" && userData.roleName !== SALES_PERSON_ROLE) &&
-                            (c.key == "pendingAmount" && userData.roleName !== SALES_PERSON_ROLE)
-                        )}
+                        columns={TABLE_COLUMNS()
+                            .filter((c: any) =>
+                                (c.key !== "expiryDate") &&
+                                (c.key !== "storeName") &&
+
+                                (c.key == "salesPersonName" ? Boolean(userData?.rolePermissions?.salesDashboard) : true)
+                                //    (c.key == "sellingPrice" && userData.roleName !== SALES_PERSON_ROLE) &&
+                                //     (c.key == "pendingAmount" && userData.roleName !== SALES_PERSON_ROLE) && 
+
+                            )
+                        }
                         dataSource={data}
                         onChange={handleChange}
                     />
