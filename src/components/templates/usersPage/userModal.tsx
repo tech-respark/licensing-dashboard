@@ -1,10 +1,12 @@
+import { PRODUCTS_LIST } from "@/constants/common";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { createUser, updateUser } from "@/lib/internalApi/user";
+import { createUser, getUserByEmail, updateUser } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
+import { removeObjRef } from "@/utils/common";
 import { Button, Card, Checkbox, Form, Input, Modal, Select, Space } from "antd";
-import React, { useEffect, useState } from "react";
+import React, { Fragment, useEffect, useState } from "react";
 const { Meta } = Card;
 
 const dummyUser = {
@@ -27,7 +29,8 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
     const dispatch = useAppDispatch();
     const userData = useAppSelector(getAuthUserState);
     const [inActiveRoleDetails, setinActiveRoleDetails] = useState<any>(null)
-
+    const [showDuplicateUserModal, setShowDuplicateUserModal] = useState<any>({ active: false, user: null });
+    const [productWiseUser, setProductWiseUser] = useState<any>(removeObjRef(PRODUCTS_LIST));
     interface FieldData {
         name: string | number | (string | number)[];
         value?: any;
@@ -55,24 +58,35 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                 currentRole = currentRole?.roleId;
             }
             console.log(modalData.user)
+            const productWiseUserCopy = [...productWiseUser];
+            productWiseUserCopy.map((p: any) => {
+                let currentRole = modalData.user.userProductsList.find((r: any) => r.productId == p.productId);
+                if (currentRole) {
+                    const roleDetails = rolesList.find((r: any) => r.id == currentRole?.roleId)
+                    p.roleId = roleDetails.id;
+                    p.roleName = roleDetails.roleName;
+                }
+            })
+            setProductWiseUser(productWiseUserCopy);
             setFields([
                 { label: "Active", name: ["active"], value: modalData?.user?.active },
                 { label: "Name", name: ["name"], value: modalData?.user?.name },
                 { label: "Phone Number", name: ["phoneNumber"], value: modalData?.user?.phoneNumber },
                 { label: "Email", name: ["email"], value: modalData?.user?.email },
                 // { label: "Password", name: ["password"], value: modalData?.user?.password },
-                { label: "Role", name: ["roleId"], value: currentRole },
+                // { label: "Role", name: ["roleId"], value: currentRole },
                 { label: "Alternate Number", name: ["altPhoneNumber"], value: modalData?.user?.altPhoneNumber },
                 { label: "Designation", name: ["designation"], value: modalData?.user?.designation },
             ])
         } else {
+            setProductWiseUser(removeObjRef(PRODUCTS_LIST))
             setFields([
                 { label: "Active", name: ["active"], value: true },
                 { label: "Name", name: ["name"], value: "" },
                 { label: "Phone Number", name: ["phoneNumber"], value: "" },
                 { label: "Email", name: ["email"], value: "" },
-                { label: "Password", name: ["password"], value: "" },
-                { label: "Role", name: ["roleId"], value: "" },
+                // { label: "Password", name: ["password"], value: "" },
+                // { label: "Role", name: ["roleId"], value: "" },
                 { label: "Alternate Number", name: ["altPhoneNumber"], value: "" },
                 { label: "Designation", name: ["designation"], value: "" },
             ])
@@ -83,7 +97,6 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
 
         const details = {
             ...values,
-            "userProductIds": "1",
             "gender": "MALE",
             // "userPermissionsList": [getPermissions()],
         }
@@ -91,24 +104,36 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
             details.id = modalData?.user?.id;
             details.modifiedBy = userData.name;
             details.modifiedByUserId = userData.id;
-            let currentRoleIndex = modalData.user.userProductsList.findIndex((r: any) => r.productId == userData.productId)
-            if (modalData.user.userProductsList[currentRoleIndex].roleId != details.roleId) {
-                const roleDetails = rolesList.find((r: any) => details.roleId == r.id);
-                details.userProductsList = modalData.user.userProductsList;
-                details.userProductsList[currentRoleIndex].roleId = details.roleId;
-                details.userProductsList[currentRoleIndex].roleName = roleDetails.roleName;
-            }
+
+            // let currentRoleIndex = modalData.user.userProductsList.findIndex((r: any) => r.productId == userData.productId)
+            // if (modalData.user.userProductsList[currentRoleIndex].roleId != details.roleId) {
+            //     const roleDetails = rolesList.find((r: any) => details.roleId == r.id);
+            //     details.userProductsList = modalData.user.userProductsList;
+            //     details.userProductsList[currentRoleIndex].roleId = details.roleId;
+            //     details.userProductsList[currentRoleIndex].roleName = roleDetails.roleName;
+            // }
         } else {
             details.createdBy = userData.name;
             details.createdByUserId = userData.id;
             const roleDetails = rolesList.find((r: any) => details.roleId == r.id);
-            details.userProductsList = [{
-                "productId": userData.productId,
-                "roleId": details.roleId,
-                "roleName": roleDetails.roleName,
-                "active": true,
-            }]
+            // details.userProductsList = [{
+            //     "productId": userData.productId,
+            //     "roleId": details.roleId,
+            //     "roleName": roleDetails.roleName,
+            //     "active": true,
+            // }]
         }
+        details.userProductsList = [];
+        productWiseUser.map((product: any) => {
+            if (product.roleId) {
+                details.userProductsList.push({
+                    "productId": product.productId,
+                    "roleId": product.roleId,
+                    "roleName": product.roleName,
+                    "active": product.active,
+                })
+            }
+        })
         console.log("final details", details)
         const api = modalData?.user?.id ? updateUser : createUser;
         api(details).then((res: any) => {
@@ -125,6 +150,16 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
     const getRolesOptions = () => {
         const options: any = rolesList.filter((r: any) => r.active).map((r: any) => ({ value: r.id, label: r.roleName }));
         return options
+    }
+
+    const onChangeValue = (from: any, value: any) => {
+        if (from == "Email" && value.includes("@") && value.includes(".com")) {
+            getUserByEmail(form.getFieldValue('email')).then((res: any) => {
+                if (res?.data) {
+                    setShowDuplicateUserModal({ active: true, user: res.data });
+                }
+            })
+        }
     }
 
     return (
@@ -185,27 +220,67 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                                             name={item.name}
                                             rules={item.label == "Alternate Number" || item.label == "Designation" ? [] : [{ required: true, message: `Please enter your ${item.label}` }]}
                                         >
-                                            <Input />
+                                            <Input onChange={(e) => onChangeValue(item.label, e.target.value)} />
                                         </Form.Item>
                                     }
                                 </React.Fragment>
                             })}
-
                         </Form>
+                        <Space direction="vertical">
+                            {productWiseUser.map((product: any, i: number) => {
+                                return <Fragment key={i}>
+                                    <Space>
+                                        <Space>{product.productName} :</Space>
+                                        <Space>
+                                            <Select
+                                                showSearch
+                                                style={{ width: 200 }}
+                                                placeholder="Search to Select"
+                                                optionFilterProp="children"
+                                                filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
+                                                filterSort={(optionA, optionB) =>
+                                                    (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
+                                                }
+                                                defaultValue={product.roleId}
+                                                value={product.roleId}
+                                                onChange={(value: any) => {
+                                                    const productWiseUserCopy = [...productWiseUser];
+                                                    productWiseUserCopy[i].roleName = rolesList.find((r: any) => r.id == value).roleName;
+                                                    productWiseUserCopy[i].roleId = value;
+                                                    setProductWiseUser(productWiseUserCopy);
+                                                }}
+                                                options={getRolesOptions()}
+                                            />
+                                        </Space>
+                                        <Space>
+                                            <Checkbox defaultChecked={product.active} checked={product.active} onChange={() => {
+                                                const productWiseUserCopy = [...productWiseUser];
+                                                productWiseUserCopy[i].active = !productWiseUserCopy[i].active;
+                                                setProductWiseUser(productWiseUserCopy);
+                                            }}>
+                                                Active
+                                            </Checkbox>
+                                        </Space>
+                                    </Space>
+                                </Fragment>
+                            })}
+                        </Space>
                     </Card>
                 </Space>
-                {/* <Card style={{ width: "100%" }}>
-                    <Space direction="vertical">
-                        <Meta title="User Permissions" />
-                        <Checkbox.Group
-                            value={checkedList}
-                            options={options as CheckboxOptionType[]}
-                            onChange={(value) => {
-                                setCheckedList(value as string[]);
-                            }}
-                        />
+                <Modal title="Basic Modal"
+                    closable={false}
+                    cancelButtonProps={{ style: { display: "none" } }}
+                    open={showDuplicateUserModal.active} onOk={() => {
+                        form.setFieldValue("email", '');
+                        setShowDuplicateUserModal({ active: false, user: null })
+                    }}
+                    cancelText=""
+                    onCancel={() => { }}
+                >
+                    <Space wrap>
+                        User {showDuplicateUserModal.user?.name} already registered with email {showDuplicateUserModal.user?.email}
                     </Space>
-                </Card> */}
+                </Modal>
             </Space>
         </Modal>
     )

@@ -169,7 +169,7 @@ function LoginPage() {
 
                     <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
                         <Button type="primary" htmlType="submit">
-                            Submit
+                            Login
                         </Button>
                         <Button type="link" onClick={() => router.push("/resetPassword")}>
                             Forgot Password

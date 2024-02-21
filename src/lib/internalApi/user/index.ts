@@ -13,6 +13,20 @@ export const getUserByCredentials = (cred: any) => {
     })
 }
 
+export const getUserByEmail = (id: any) => {
+    return new Promise((res, rej) => {
+        axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/userByEmail?email=` + id)
+            .then((response: any) => {
+                if (response?.data?.data) res(response.data);
+                else rej(response?.data?.message)
+            }).catch(function (error: any) {
+                rej(error.message);
+                console.log(`/login `, error);
+            });
+    })
+}
+
+
 export const getUserById = (id: any) => {
     return new Promise((res, rej) => {
         axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/userById?userId=` + id)
@@ -25,6 +39,7 @@ export const getUserById = (id: any) => {
             });
     })
 }
+
 export const getUsersByProduct = (productId: any) => {
     return new Promise((res, rej) => {
         axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/usersByProductId?productId=${productId}`)

@@ -1,4 +1,4 @@
-import { PRODUCTS_LIST } from "@/constants/common";
+import { ADMIN_ROLE, CEO_ROLE, PRODUCTS_LIST } from "@/constants/common";
 import NavigationMenus from "@/constants/navigation";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
@@ -6,7 +6,7 @@ import { getAuthUserState, setAuthUser } from "@/redux/slices/auth";
 import { getDarkModeState, toggleDarkMode } from "@/redux/slices/clientThemeConfig";
 import { showSuccessToast } from "@/redux/slices/toast";
 import { removeObjRef } from "@/utils/common";
-import { Avatar, Button, Card, Layout, Popover, Space, Typography } from "antd";
+import { Avatar, Button, Card, Layout, Popover, Select, Space, Typography } from "antd";
 import { usePathname, useRouter } from "next/navigation";
 import { useCallback } from "react";
 import { LuCloudSunRain, LuLogOut, LuUser } from 'react-icons/lu';
@@ -80,7 +80,7 @@ function HeaderComponent() {
             }}
             className={Styles.headerComponentWrap}
         >
-            {/* <Space style={{ width: "100%" }} size={20}>
+            <Space style={{ width: "100%" }} size={20}>
                 <Text style={{ color: 'white', fontSize: 16 }}>{currentpage()}</Text>
                 {(userData?.roleName == ADMIN_ROLE || userData?.roleName == CEO_ROLE) && <Select
                     style={{ width: "auto" }}
@@ -89,7 +89,7 @@ function HeaderComponent() {
                     onChange={onChangeProduct}
                     options={getProductOptions()}
                 />}
-            </Space> */}
+            </Space>
             <Space align="end" className={Styles.elements} size={15}>
 
                 {/* <Popover content={renderNotificationContent()} title="Your Notifications" trigger="hover">

@@ -1,9 +1,1 @@
-{
-  "/page": "app/page.js",
-  "/(withLayout)/sales/page": "app/(withLayout)/sales/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js",
-  "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
-  "/(withLayout)/users/page": "app/(withLayout)/users/page.js",
-  "/(withLayout)/roles/page": "app/(withLayout)/roles/page.js",
-  "/(withoutLyaout)/login/page": "app/(withoutLyaout)/login/page.js"
-}
+{}
