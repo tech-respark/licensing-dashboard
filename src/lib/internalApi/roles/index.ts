@@ -1,9 +1,9 @@
 import { axiosClient } from "@/lib/axios/axiosClient";
 
 
-export const getRolesByProduct = (productId: any) => {
+export const getRoles = () => {
     return new Promise((res, rej) => {
-        axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/rolesByProductId?productId=${productId}`)
+        axiosClient.GET(`${process.env.NEXT_PUBLIC_BASE_URL}/roles`)
             .then((response: any) => {
                 if (response.data) res(response.data);
                 else rej(response.data.message)

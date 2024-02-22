@@ -1,6 +1,6 @@
 "use client"
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { getRolesByProduct } from "@/lib/internalApi/roles";
+import { getRoles } from "@/lib/internalApi/roles";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { Button, Card, Space } from "antd";
 import { useEffect, useState } from "react";
@@ -15,10 +15,10 @@ function RolesPage() {
 
     useEffect(() => {
         if (userData?.productId) {
-            getRolesByProduct(userData?.productId).then((res: any) => {
+            getRoles().then((res: any) => {
                 if (res.data) setRolesList(res.data)
             }).catch(function (error: any) {
-                console.log(`/getRolesByProduct `, error);
+                console.log(`/getRoles `, error);
             });
         }
     }, [])

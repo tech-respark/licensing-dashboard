@@ -1,7 +1,7 @@
 import { PRODUCTS_LIST } from "@/constants/common";
 import { useAppDispatch } from "@/hooks/useAppDispatch";
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { createUser, getUserByEmail, updateUser } from "@/lib/internalApi/user";
+import { createUser, getUserByEmail, getUserByPhoneNumber, updateUser } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { showErrorToast, showSuccessToast } from "@/redux/slices/toast";
 import { removeObjRef } from "@/utils/common";
@@ -29,7 +29,7 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
     const dispatch = useAppDispatch();
     const userData = useAppSelector(getAuthUserState);
     const [inActiveRoleDetails, setinActiveRoleDetails] = useState<any>(null)
-    const [showDuplicateUserModal, setShowDuplicateUserModal] = useState<any>({ active: false, user: null });
+    const [showDuplicateUserModal, setShowDuplicateUserModal] = useState<any>({ active: false, user: null, from: "" });
     const [productWiseUser, setProductWiseUser] = useState<any>(removeObjRef(PRODUCTS_LIST));
     interface FieldData {
         name: string | number | (string | number)[];
@@ -48,7 +48,7 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
 
     useEffect(() => {
         if (modalData.user) {
-
+            form.resetFields();
             let currentRole = modalData.user.userProductsList.find((r: any) => r.productId == userData.productId)
             const roleDetails = rolesList.find((r: any) => r.id == currentRole?.roleId)
             if (!(roleDetails?.active)) {
@@ -138,9 +138,14 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
         console.log("final details", details)
         const api = modalData?.user?.id ? updateUser : createUser;
         api(details).then((res: any) => {
-            dispatch(showSuccessToast("User created successfully."))
-            handleModalResponse({ ...details, id: res?.data?.id || Math.random() })
-            form.resetFields();
+            if (res.data) {
+                dispatch(showSuccessToast("User created successfully."))
+                handleModalResponse({ ...details, id: res?.data?.id || Math.random() })
+                form.resetFields();
+            } else if (res.message) {
+                console.log(res.message)
+                dispatch(showErrorToast(`User creation failed. Reason: ${res.message}`))
+            }
         })
             .catch((error: any) => {
                 console.log(error)
@@ -157,9 +162,19 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
         if (from == "Email" && value.includes("@") && value.includes(".com")) {
             getUserByEmail(form.getFieldValue('email')).then((res: any) => {
                 if (res?.data) {
-                    setShowDuplicateUserModal({ active: true, user: res.data });
+                    setShowDuplicateUserModal({ active: true, user: res.data, from: "email" });
                 }
-            })
+            }).catch((info) => {
+                console.log('Validated:', info);
+            });
+        } else if (from == "Phone Number" && value.length >= 10) {
+            getUserByPhoneNumber(form.getFieldValue('phoneNumber')).then((res: any) => {
+                if (res?.data) {
+                    setShowDuplicateUserModal({ active: true, user: res.data, from: "phoneNumber" });
+                }
+            }).catch((info) => {
+                console.log('Validated:', info);
+            });
         }
     }
 
@@ -219,7 +234,14 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                                         </> : <Form.Item
                                             label={item.label}
                                             name={item.name}
-                                            rules={item.label == "Alternate Number" || item.label == "Designation" ? [] : [{ required: true, message: `Please enter your ${item.label}` }]}
+                                            rules={
+                                                item.label == "Phone Number" ?
+                                                    [
+                                                        { required: true, message: `Please enter your number` },
+                                                        { min: 10, message: 'Phone number must be 10 digit.' },
+                                                        { max: 10, message: 'Phone number must be 10 digit.' },
+                                                    ] :
+                                                    (item.label == "Alternate Number" || item.label == "Designation") ? [] : [{ required: true, message: `Please enter your ${item.label}` }]}
                                         >
                                             <Input onChange={(e) => onChangeValue(item.label, e.target.value)} />
                                         </Form.Item>
@@ -272,14 +294,14 @@ function UserModal({ modalData, handleModalResponse, rolesList }: any) {
                     closable={false}
                     cancelButtonProps={{ style: { display: "none" } }}
                     open={showDuplicateUserModal.active} onOk={() => {
-                        form.setFieldValue("email", '');
-                        setShowDuplicateUserModal({ active: false, user: null })
+                        form.setFieldValue(showDuplicateUserModal.from, '');
+                        setShowDuplicateUserModal({ active: false, user: null, from: "" })
                     }}
                     cancelText=""
                     onCancel={() => { }}
                 >
                     <Space wrap>
-                        User {showDuplicateUserModal.user?.name} already registered with email {showDuplicateUserModal.user?.email}
+                        User {showDuplicateUserModal.user?.name} is already registered with email {showDuplicateUserModal.user?.email} and mobile number {showDuplicateUserModal.user?.phoneNumber}
                     </Space>
                 </Modal>
             </Space>

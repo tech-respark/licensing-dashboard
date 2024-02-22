@@ -1,6 +1,6 @@
 import { REQUEST_STATUSES, SALES_PERSON_ROLE } from '@/constants/common';
 import { useAppSelector } from '@/hooks/useAppSelector';
-import { getUsersByProduct } from '@/lib/internalApi/user';
+import { getUsers } from '@/lib/internalApi/user';
 import { getAuthUserState } from '@/redux/slices/auth';
 import { Button, DatePicker, Divider, Popover, Select, Space, Typography } from 'antd';
 import dayjs from 'dayjs';
@@ -28,12 +28,12 @@ function Filters({ defaultFilters, hide = "", initialFilters, setInitialFilters 
         setStatusOptions(options)
 
         if (userData?.productId) {
-            getUsersByProduct(userData?.productId).then((res: any) => {
+            getUsers().then((res: any) => {
                 if (res.data) setSalesPersonsList(res.data.filter((u: any) => u.roleName == SALES_PERSON_ROLE).map((u: any) => (
                     { value: u.id, label: u.name }
                 )))
             }).catch(function (error: any) {
-                console.log(`/getUsersByProduct `, error);
+                console.log(`/getUsers `, error);
             });
         }
     }, [])

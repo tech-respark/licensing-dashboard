@@ -1,7 +1,7 @@
 "use client"
 import { useAppSelector } from "@/hooks/useAppSelector";
-import { getRolesByProduct } from "@/lib/internalApi/roles";
-import { getUsersByProduct } from "@/lib/internalApi/user";
+import { getRoles } from "@/lib/internalApi/roles";
+import { getUsers } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { Button, Card, Space } from "antd";
 import { useEffect, useState } from "react";
@@ -17,17 +17,17 @@ function UsersPage() {
 
     useEffect(() => {
         if (userData?.productId) {
-            getUsersByProduct(userData?.productId).then((res: any) => {
+            getUsers().then((res: any) => {
                 if (res.data) {
                     setUsersList(res.data)
                 }
             }).catch(function (error: any) {
-                console.log(`/getUsersByProduct `, error);
+                console.log(`/getUsers `, error);
             });
-            getRolesByProduct(userData?.productId).then((res: any) => {
+            getRoles().then((res: any) => {
                 if (res.data) setRolesList(res.data)
             }).catch(function (error: any) {
-                console.log(`/getRolesByProduct `, error);
+                console.log(`/getRoles `, error);
             });
         }
     }, [])
@@ -70,7 +70,7 @@ function UsersPage() {
                     </Card>
                 })}
             </Space>
-            <UserModal rolesList={rolesList} modalData={modalData} handleModalResponse={handleModalResponse} />
+            {modalData.active && <UserModal rolesList={rolesList} modalData={modalData} handleModalResponse={handleModalResponse} />}
         </Space>
     )
 }

@@ -157,7 +157,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         if (form.getFieldValue("duration") && Boolean(storesDetails?.length)) {
             storesDetails.map((store: any) => {
                 store.endDate = getEndDate(store.startDate, form.getFieldValue("duration"));
-                store.modulesList.map((m: any) => m.modulePrice = (m.modulePrice || m[form.getFieldValue("duration")]))
+                store.modulesList.map((m: any) => m.modulePrice = (m[form.getFieldValue("duration")] || m.modulePrice))
                 console.log("store.modulesList", store.modulesList)
             })
             updateTotal(storesDetails)

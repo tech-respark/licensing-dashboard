@@ -6,7 +6,7 @@ import { useAppSelector } from '@/hooks/useAppSelector';
 import { getClientsByProduct } from '@/lib/internalApi/clients';
 import { getModulesByProduct } from '@/lib/internalApi/module';
 import { getDashboardRequests, getRequestById } from '@/lib/internalApi/requests';
-import { getUsersByProduct } from '@/lib/internalApi/user';
+import { getUsers } from '@/lib/internalApi/user';
 import { getAuthUserState } from '@/redux/slices/auth';
 import { toggleLoader } from '@/redux/slices/loader';
 import type { CheckboxOptionType, TableProps } from 'antd';
@@ -73,10 +73,10 @@ function DashboardPage() {
                     console.log(`/getClientsByProduct `, error);
                 });
 
-                getUsersByProduct(userData?.productId).then((res: any) => {
+                getUsers().then((res: any) => {
                     if (res.data) usersList = res.data.filter((u: any) => u.userProductsList.find((r: any) => r.productId == userData?.productId).roleName == SALES_PERSON_ROLE);
                 }).catch(function (error: any) {
-                    console.log(`/getUsersByProduct `, error);
+                    console.log(`/getUsers `, error);
                 });
                 getModulesByProduct(userData?.productId).then((res: any) => {
                     if (res.data) modulesList = res.data;

@@ -11,7 +11,6 @@ const { Meta } = Card;
 
 const dummyRole = {
     "roleName": "test 2",
-    "productId": 1,
     "description": "test 2 description",
     "active": true,
     "rolePermissions": {
@@ -110,7 +109,6 @@ function RolesModal({ modalData, handleModalResponse }: any) {
 
         const details = {
             ...values,
-            "productId": userData?.productId,
             "rolePermissions": getPermissions(),
         }
         console.log("final details", details)

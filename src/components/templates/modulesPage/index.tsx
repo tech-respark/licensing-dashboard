@@ -18,7 +18,7 @@ function ModulePage() {
             getModulesByProduct(userData?.productId).then((res: any) => {
                 if (res.data) setModulesList(res.data)
             }).catch(function (error: any) {
-                console.log(`/getUsersByProduct `, error);
+                console.log(`/getUsers `, error);
             });
         }
     }, [])
