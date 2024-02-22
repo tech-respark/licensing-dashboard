@@ -1,5 +1,4 @@
 {
   "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
-  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/(withLayout)/sales/page": "app/(withLayout)/sales/page.js"
 }

@@ -49,8 +49,8 @@ function DashboardPage() {
         "productId": userData?.productId,
         "userId": null,
         "currentStatus": null,
-        "sortBy": "DESC",
-        "orderBy": "",
+        "sortBy": "ASC",
+        "orderBy": "expiryDate",
         "fromDate": new Date(),
         "toDate": new Date(),
         "pageNumber": 1,
@@ -108,7 +108,7 @@ function DashboardPage() {
         getDashboardRequests(
             {
                 ...filters,
-                orderBy: "sellingPrice",
+                orderBy: "expiryDate",
                 fromDate: dayjs(filters.fromDate).format(DATE_FORMAT),
                 toDate: dayjs(filters.toDate).format(DATE_FORMAT)
             }

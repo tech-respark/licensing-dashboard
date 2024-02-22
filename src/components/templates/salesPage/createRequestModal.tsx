@@ -83,7 +83,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                         moduleDetails.modulePrice = store?.modulesList?.find((m: any) => m.moduleId == moduleDetails.id)?.modulePrice;
                     } else {
                         moduleDetails.selected = false;
-                        // moduleDetails.modulePrice = moduleDetails[defaultDuration];
+                        moduleDetails.modulePrice = moduleDetails[defaultDuration];
                     }
                     storeDetails.modulesList.push(moduleDetails)
                 })
@@ -154,14 +154,16 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
     }, [Form.useWatch('client', form)])
 
     useEffect(() => {
-        if (form.getFieldValue("duration") && Boolean(storesDetails?.length)) {
-            storesDetails.map((store: any) => {
-                store.endDate = getEndDate(store.startDate, form.getFieldValue("duration"));
-                store.modulesList.map((m: any) => m.modulePrice = (m[form.getFieldValue("duration")] || m.modulePrice))
-                console.log("store.modulesList", store.modulesList)
-            })
-            updateTotal(storesDetails)
-        }
+
+        // if (form.getFieldValue("duration") && Boolean(storesDetails?.length) && initialLoad) {
+        //     storesDetails.map((store: any) => {
+        //         store.endDate = getEndDate(store.startDate, form.getFieldValue("duration"));
+        //         store.modulesList.map((m: any) => m.modulePrice = (m[form.getFieldValue("duration")] || m.modulePrice))
+        //         console.log("store.modulesList", store.modulesList)
+        //         initialLoad = true;
+        //     })
+        //     updateTotal(storesDetails)
+        // }
     }, [Form.useWatch('duration', form)])
 
     const handleCancel = () => {
@@ -290,6 +292,14 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
         setRequestDetails({ ...requestDetails, statusesList: statusList })
     }
 
+    const onChangeDuration = (value: any) => {
+        storesDetails.map((store: any) => {
+            store.endDate = getEndDate(store.startDate, value);
+            store.modulesList.map((m: any) => m.modulePrice = m[value])
+        })
+        updateTotal(storesDetails)
+    }
+
     return (
         <Modal title={requestDetails ? "Update Request" : "Add New Request"} open={modalData?.active}
             styles={{
@@ -391,6 +401,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                                         (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                     }
                                     options={getDurationOptions()}
+                                    onChange={onChangeDuration}
                                 />
                             </Form.Item>
 
