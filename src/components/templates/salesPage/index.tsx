@@ -68,7 +68,6 @@ function SalesPage() {
     const [usersList, setUsersList] = useState<any[]>([]);
     const [salesRequestsList, setSalesRequestsList] = useState<DataType[]>([]);
     const dispatch = useAppDispatch()
-    console.log(userData)
     const [paginationProps, setPaginationProps] = useState({
         pageSize: 10,
         total: 0,

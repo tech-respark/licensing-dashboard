@@ -50,7 +50,7 @@ function DashboardPage() {
         "userId": null,
         "currentStatus": null,
         "sortBy": "ASC",
-        "orderBy": "expiryDate",
+        "orderBy": "",
         "fromDate": new Date(),
         "toDate": new Date(),
         "pageNumber": 1,

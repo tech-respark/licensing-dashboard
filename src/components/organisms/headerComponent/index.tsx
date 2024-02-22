@@ -82,7 +82,7 @@ function HeaderComponent() {
         >
             <Space style={{ width: "100%" }} size={20}>
                 <Text style={{ color: 'white', fontSize: 16 }}>{currentpage()}</Text>
-                {(userData?.roleName == ADMIN_ROLE || userData?.roleName == CEO_ROLE) && <Select
+                {((userData?.roleName == ADMIN_ROLE || userData?.roleName == CEO_ROLE) || userData.userProductsList.filter((p: any) => p.active).length > 1) && <Select
                     style={{ width: "auto" }}
                     placeholder="Select Product"
                     value={userData?.productId}
