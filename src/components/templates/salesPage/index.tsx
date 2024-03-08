@@ -121,7 +121,7 @@ function SalesPage() {
                 let usersList: any = null;
                 let modulesList: any = null;
 
-                getClientsByProduct(defaultFilters).then((res: any) => {
+                getClientsByProduct({ ...defaultFilters, recordsPerPage: 10000 }).then((res: any) => {
                     if (res.data) clientsList = res.data;
                 }).catch(function (error: any) {
                     console.log(`/getClientsByProduct `, error);
