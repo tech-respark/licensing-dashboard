@@ -7,13 +7,15 @@ import { getClientById, getClientsByProduct } from '@/lib/internalApi/clients';
 import { getAuthUserState } from '@/redux/slices/auth';
 import { toggleLoader } from '@/redux/slices/loader';
 import type { TableProps } from 'antd';
-import { Button, Card, Space, Table } from 'antd';
+import { Button, Card, Input, Space, Table } from 'antd';
+import type { SearchProps } from 'antd/es/input/Search';
 import dayjs from 'dayjs';
 import { useEffect, useState } from 'react';
 import Filters from '../dashboardPage/filters';
 import ClientModal from './clientModal';
 import Styles from "./clientsPage.module.scss";
 import { TABLE_COLUMNS } from './constant';
+const { Search } = Input;
 
 interface DataType {
     key: string;
@@ -44,6 +46,7 @@ function ClientsPage() {
         "filters": [],
         "productId": userData?.productId,
         "userId": null,
+        "searchKeyword": "",
         "currentStatus": null,
         "sortBy": "DESC",
         "orderBy": "",
@@ -94,12 +97,21 @@ function ClientsPage() {
 
     const data: DataType[] = [...clientsList];
 
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => setFilters({ ...filters, searchKeyword: value });
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
                 <Card title="All Clients List"
                     extra={
                         <Space>
+                            <Search
+                                placeholder="Search by business name"
+                                allowClear
+                                enterButton="Search"
+                                size="middle"
+                                style={{ width: 300 }}
+                                onSearch={onSearch}
+                            />
                             <Button type='primary' onClick={() => setModalData({ active: true, client: null })}>Add New Client</Button>
                             <Filters hide={"status"} defaultFilters={defaultFilters} setInitialFilters={setFilters} initialFilters={filters} />
                         </Space>}

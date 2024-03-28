@@ -9,7 +9,8 @@ import { getUsers } from "@/lib/internalApi/user";
 import { getAuthUserState } from "@/redux/slices/auth";
 import { toggleLoader } from "@/redux/slices/loader";
 import type { TableProps } from 'antd';
-import { Button, Card, Space, Table } from "antd";
+import { Button, Card, Input, Space, Table } from "antd";
+import type { SearchProps } from 'antd/es/input/Search';
 import dayjs from "dayjs";
 import { useEffect, useState } from "react";
 import Filters from "../dashboardPage/filters";
@@ -19,6 +20,7 @@ import { TABLE_COLUMNS } from "./constant";
 import CreateRequestModal from "./createRequestModal";
 import { REQUEST_STATUSES } from "./requestActions";
 import Styles from "./salespage.module.scss";
+const { Search } = Input;
 
 const dummyRequest = {
     "id": 30,
@@ -80,6 +82,7 @@ function SalesPage() {
         "productId": userData?.productId,
         "userId": null,
         "currentStatus": null,
+        "searchKeyword": "",
         "sortBy": "DESC",
         "orderBy": "",
         "fromDate": new Date(),
@@ -178,6 +181,8 @@ function SalesPage() {
         console.log('Various parameters', pagination);
     };
 
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => setFilters({ ...filters, searchKeyword: value });
+
     return (
         <>
             <Space className={Styles.dashboardWrapper} direction='vertical'>
@@ -191,6 +196,14 @@ function SalesPage() {
                                     setModalData({ active: true, request: null })
                                 })
                             }}>Add New Request</Button>
+                            <Search
+                                placeholder="Search by business name"
+                                allowClear
+                                enterButton="Search"
+                                size="middle"
+                                style={{ width: 300 }}
+                                onSearch={onSearch}
+                            />
                             <Filters defaultFilters={defaultFilters} setInitialFilters={setFilters} initialFilters={filters} />
                         </Space>}
                 >

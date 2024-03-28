@@ -10,7 +10,8 @@ import { getUsers } from '@/lib/internalApi/user';
 import { getAuthUserState } from '@/redux/slices/auth';
 import { toggleLoader } from '@/redux/slices/loader';
 import type { CheckboxOptionType, TableProps } from 'antd';
-import { Button, Card, Checkbox, Popover, Space, Table, Typography } from 'antd';
+import { Button, Card, Checkbox, Input, Popover, Space, Table, Typography } from 'antd';
+import type { SearchProps } from 'antd/es/input/Search';
 import dayjs from 'dayjs';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
@@ -23,6 +24,7 @@ import Filters from './filters';
 import PieChartView from './pieChartView';
 import SalesDetailsModal from './salesDetailsModal';
 const { Text, Title } = Typography;
+const { Search } = Input;
 
 type OnChange = NonNullable<TableProps<DataType>['onChange']>;
 
@@ -48,6 +50,7 @@ function DashboardPage() {
         "filters": [],
         "productId": userData?.productId,
         "userId": null,
+        "searchKeyword": "",
         "currentStatus": null,
         "sortBy": "ASC",
         "orderBy": "",
@@ -176,10 +179,20 @@ function DashboardPage() {
         </Space>
     }
 
+    const onSearch: SearchProps['onSearch'] = (value, _e, info) => setFilters({ ...filters, searchKeyword: value });
+
     const renderHeaders = () => {
         return <Space className={Styles.tableHeader}>
             <Button type='primary' onClick={() => setChartView(!chartView)} icon={<LuPieChart />}>{!chartView ? "Chart" : "Table"} View</Button>
             <Text className={Styles.label}>Sales Requests Table</Text>
+            <Search
+                placeholder="Search by business name"
+                allowClear
+                enterButton="Search"
+                size="middle"
+                style={{ width: 300 }}
+                onSearch={onSearch}
+            />
             {chartView ? <Button disabled={true} icon={<LuColumns />}>Columns</Button> : <Popover title="Show or Hide Columns" content={renderColumnsSettings()}>
                 <Button disabled={chartView} icon={<LuColumns />}>Columns</Button>
             </Popover>}

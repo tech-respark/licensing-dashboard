@@ -169,7 +169,23 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
     const handleCancel = () => {
         handleModalResponse();
     };
-
+    const getDuration = () => {
+        const duration = form.getFieldValue("duration")
+        switch (duration) {
+            case 'monthlyPrice':
+                return "MONTHLY"
+                break;
+            case 'quarterlyPrice':
+                return "QUARTERLY"
+                break;
+            case 'halfYearlyPrice':
+                return "HALF_YEARLY"
+                break;
+            case 'yearlyPrice':
+                return "ANNUALLY"
+                break;
+        }
+    }
     const getstoreSalesList = () => {
         const storesList: any = [];
         storesDetails.map((store: any) => {
@@ -180,6 +196,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                 "endDate": dayjs(store.endDate).format(DATE_FORMAT),
                 "generatedStorePrice": Number(store.total),
                 "isTrial": false,
+                "duration": getDuration(),
                 "modulesList": store.modulesList.filter((module: any) => module.selected).map((m: any) => ({ moduleId: m.id, modulePrice: m.modulePrice }))
             })
         })
@@ -358,7 +375,7 @@ function CreateRequestModal({ modalData, handleModalResponse, clientsList, modul
                                         style={{ width: 200 }}
                                         placeholder="Search to Select"
                                         optionFilterProp="children"
-                                        filterOption={(input: any, option: any) => (option?.label ?? '').includes(input)}
+                                        filterOption={(input: any, option: any) => (option?.label ?? '').toLowerCase().includes(input.toLowerCase())}
                                         filterSort={(optionA: any, optionB: any) =>
                                             (optionA?.label ?? '').toLowerCase().localeCompare((optionB?.label ?? '').toLowerCase())
                                         }

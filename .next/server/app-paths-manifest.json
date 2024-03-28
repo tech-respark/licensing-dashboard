@@ -1,7 +1,7 @@
 {
-  "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js",
+  "/page": "app/page.js",
+  "/(withLayout)/modules/page": "app/(withLayout)/modules/page.js",
+  "/(withLayout)/requestDetails/[requestId]/page": "app/(withLayout)/requestDetails/[requestId]/page.js",
   "/(withLayout)/sales/page": "app/(withLayout)/sales/page.js",
-  "/manifest.webmanifest/route": "app/manifest.webmanifest/route.js",
-  "/(withLayout)/clients/page": "app/(withLayout)/clients/page.js",
-  "/favicon.ico/route": "app/favicon.ico/route.js"
+  "/(withLayout)/dashboard/page": "app/(withLayout)/dashboard/page.js"
 }

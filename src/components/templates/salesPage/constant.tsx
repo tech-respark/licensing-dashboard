@@ -18,6 +18,11 @@ export const TABLE_COLUMNS = () => [
         key: 'invoiceNumber'
     },
     {
+        title: 'Start Date',
+        dataIndex: 'startDate',
+        key: 'startDate'
+    },
+    {
         title: 'Business Name',
         dataIndex: 'tenantBusinessName',
         key: 'tenantBusinessName',
